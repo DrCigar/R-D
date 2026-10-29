@@ -25,6 +25,8 @@ export const SEED_PRODUCTS = [
     pros: ['Customer-facing price screen', 'Replaces the A920'] },
   { id: 'pax-a360', name: 'PAX A360 Pin Pad', category: 'Payment devices', vendor: 'PAX',
     availability: 'unknown', launch: 'Details and launch date not yet known', demoStatus: 'none' },
+  { id: 'pax-a380', name: 'PAX A380 Pin Pad', category: 'Payment devices', vendor: 'PAX',
+    availability: 'unknown' },
   { id: 'evo-sim', name: 'EVO SIM Card for Cradlepoint Routers', category: 'Networking and connectivity', vendor: 'Mobility Help Desk',
     demoStatus: 'inhouse',
     pros: ['Better data plan', 'Better coverage across cellular networks'] },
