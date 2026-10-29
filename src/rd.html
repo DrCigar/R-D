@@ -64,8 +64,8 @@ img{max-width:100%}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s}
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .ph{aspect-ratio:16/10;background:linear-gradient(135deg,#F1F1EE,#E6E6E2);position:relative;display:grid;place-items:center;color:#B9B9B4;overflow:hidden}
-.ph img{width:100%;height:100%;object-fit:contain;background:#fff}
-.ph .pill{position:absolute;top:10px;left:10px}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;padding:10px}
+.ph .pill{position:absolute;top:10px;left:10px;z-index:1}
 .ph .hint{position:absolute;bottom:8px;right:10px;font-size:11px;color:var(--faint)}
 .cb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
 .cb .nm{font-weight:700;font-size:15px;line-height:1.25}
@@ -98,7 +98,7 @@ img{max-width:100%}
 .mc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:10px 11px;margin-bottom:8px;width:100%;text-align:left;display:flex;gap:10px;align-items:center}
 .mc:hover{box-shadow:var(--shadow)}
 .mc .th{width:44px;height:44px;border-radius:8px;background:#F1F1EE;flex:none;display:grid;place-items:center;color:#B9B9B4;overflow:hidden}
-.mc .th img{width:100%;height:100%;object-fit:contain;background:#fff}
+.mc .th{position:relative}.mc .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff}
 .mc .t{font-weight:700;font-size:13px;line-height:1.25}
 .mc .s{font-size:11.5px;color:var(--muted)}
 .empty-col{font-size:12px;color:var(--faint);text-align:center;padding:20px 0}
@@ -119,7 +119,7 @@ img{max-width:100%}
 .sec h4::before{content:"";width:3px;height:12px;background:var(--verm);border-radius:2px}
 .photo-row{display:flex;gap:14px;align-items:flex-start}
 .photo-box{width:180px;aspect-ratio:4/3;border-radius:12px;background:linear-gradient(135deg,#F1F1EE,#E6E6E2);display:grid;place-items:center;color:#B9B9B4;overflow:hidden;flex:none;border:1px solid var(--line)}
-.photo-box img{width:100%;height:100%;object-fit:contain;background:#fff}
+.photo-box{position:relative}.photo-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;padding:6px}
 .photo-act{display:flex;flex-direction:column;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted)}
 .drop{outline:2px dashed var(--verm);outline-offset:3px}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -246,7 +246,7 @@ const STATUS = {
   rejected: { l: 'Not approved', c: 'var(--s-rejected)' },
 };
 const ORDER = ['prelaunch', 'awaiting', 'testing', 'approved', 'hold', 'rejected'];
-const CAT_ORDER = ['POS tablets', 'Kiosks', 'Payment devices', 'Networking and connectivity'];
+const CAT_ORDER = ['POS tablets', 'Kiosks', 'Payment devices', 'Printers', 'Networking and connectivity'];
 const DEMO = { '': 'Not recorded', none: 'No demo unit yet', requested: 'Demo requested', inhouse: 'Demo in house', returned: 'Demo returned' };
 const AVAIL = { now: 'Available now', soon: 'Available soon', future: 'Launch date set', unknown: 'Launch date unknown' };
 const AUTH_KEY = 'pos360-rd-auth', PREVIEW_KEY = 'pos360-rd-preview-v1', VIEW_KEY = 'pos360-rd-view';
@@ -375,6 +375,7 @@ function icon(cat, size = 54) {
   if (c.includes('kiosk')) return '<svg ' + s + '><rect x="14" y="4" width="20" height="28" rx="2"/><path d="M18 8h12v16H18zM24 32v8M16 44h16"/></svg>';
   if (c.includes('payment') || c.includes('pin')) return '<svg ' + s + '><rect x="13" y="4" width="22" height="40" rx="3"/><rect x="17" y="9" width="14" height="10" rx="1"/><path d="M18 25h2M23 25h2M28 25h2M18 30h2M23 30h2M28 30h2M18 35h2M23 35h2M28 35h2"/></svg>';
   if (c.includes('network') || c.includes('router') || c.includes('connect')) return '<svg ' + s + '><rect x="6" y="26" width="36" height="12" rx="3"/><path d="M14 26 10 12M34 26l4-14M13 32h2M19 32h2"/><path d="M19 15a7 7 0 0 1 10 0M16 11a12 12 0 0 1 16 0"/></svg>';
+  if (c.includes('printer')) return '<svg ' + s + '><path d="M14 18V6h20v12"/><rect x="6" y="18" width="36" height="16" rx="3"/><path d="M14 30h20v12H14z"/></svg>';
   if (c.includes('tablet')) return '<svg ' + s + '><rect x="5" y="9" width="38" height="28" rx="3"/><path d="M10 14h28v18H10zM18 43h12M24 37v6"/></svg>';
   return '<svg ' + s + '><path d="M24 4 42 14v20L24 44 6 34V14z"/><path d="M6 14l18 10 18-10M24 24v20"/></svg>';
 }

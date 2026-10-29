@@ -2,6 +2,10 @@
 // Approval dates are approximate, worked back from "approved N weeks ago" on 2026-10-29.
 const ALL_PASS = { spec: { s: 'pass' }, bench: { s: 'pass' }, software: { s: 'pass' }, pilot: { s: 'pass' }, supply: { s: 'pass' } };
 
+// Product photos committed under img/<id>.png
+const PHOTOS = new Set(['pax-a6650', 'hanasis-floor', 'hanasis-counter', 'matsuda-counter', 'matsuda-floor', 'pax-a920-duo',
+  'pax-a360', 'pax-a380', 'inhand-ir602', 'inhand-ir624', 'aures-odp333']);
+
 const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
@@ -46,4 +50,9 @@ export const SEED_PRODUCTS = [
       'Lowest latency (URLLC-capable)', 'Works on 5G SA and NSA networks'],
     cons: ['Premium module cost', 'Higher power draw, larger unit',
       'Built for HD video, gigabit edge and high density, more than a typical store needs'] },
-].map((p, i) => ({ ...base, ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));
+  { id: 'matsuda-floor', name: 'Matsuda K300-215 Floor Standing Kiosk', category: 'Kiosks', vendor: 'Matsuda',
+    cost: 900, leadTime: '12 weeks', demoStatus: 'inhouse' },
+  { id: 'aures-odp333', name: 'Aures ODP 333 Receipt Printer', category: 'Printers', vendor: 'Aures',
+    cost: 140, decision: 'approved', decisionDate: '2026-07-29', phases: ALL_PASS,
+    pros: ['Big cost savings compared to Epson'] },
+].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));
