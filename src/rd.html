@@ -163,6 +163,7 @@ img{max-width:100%}
 .notes .n p{margin:3px 0 0;white-space:pre-wrap}
 .notes .n .del{background:none;border:0;color:var(--faint);font-size:12px;padding:0;margin-left:6px}
 .addnote{display:flex;gap:8px;align-items:flex-end}
+.addnote input{width:160px;border:1px solid var(--line);border-radius:9px;padding:8px 10px;outline:none;align-self:stretch}
 .addnote textarea{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px;resize:vertical;outline:none}
 .df{padding:12px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 
@@ -176,6 +177,8 @@ img{max-width:100%}
 
 @media (max-width:1100px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:640px){
+  .addnote{flex-wrap:wrap}.addnote input{width:100%}
+  .addnote{flex-wrap:wrap}.addnote input{width:100%}
   .top-in,.wrap{padding-left:16px;padding-right:16px}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
   .fields{grid-template-columns:1fr}
@@ -216,8 +219,7 @@ img{max-width:100%}
 <div class="modal" id="signin" hidden>
   <form id="signinForm" autocomplete="on">
     <h3>Sign in to the R&amp;D board</h3>
-    <p>Your name goes on the phases you update and the notes you leave.</p>
-    <div class="f"><label for="siName">Your name</label><input id="siName" required autocomplete="name"></div>
+    <p>Enter the team password to view and update the board.</p>
     <div class="f"><label for="siKey">Team password</label><input id="siKey" type="password" required autocomplete="current-password"></div>
     <div class="err" id="siErr" hidden></div>
     <button class="btn" type="submit">Sign in</button>
@@ -351,13 +353,12 @@ function hydratePhotos(root) {
 /* ---------- sign-in ---------- */
 function showSignin(msg) {
   $('#signin').hidden = false;
-  $('#siName').value = S.auth?.name || '';
   $('#siErr').hidden = !msg; $('#siErr').textContent = msg || '';
-  setTimeout(() => ($('#siName').value ? $('#siKey') : $('#siName')).focus(), 30);
+  setTimeout(() => $('#siKey').focus(), 30);
 }
 $('#signinForm').addEventListener('submit', async e => {
   e.preventDefault();
-  S.auth = { name: $('#siName').value.trim(), key: $('#siKey').value };
+  S.auth = { key: $('#siKey').value };
   const r = await fetch('/api/data', { headers: { 'x-rd-key': S.auth.key } }).catch(() => null);
   if (!r || r.status === 401) { $('#siErr').hidden = false; $('#siErr').textContent = 'That password didn’t work.'; return; }
   ls.set(AUTH_KEY, S.auth); $('#signin').hidden = true; $('#siKey').value = '';
@@ -366,7 +367,9 @@ $('#signinForm').addEventListener('submit', async e => {
   await refresh(j);
   if (!boot.polling) { boot.polling = setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 30000); }
 });
-const me = () => S.mode === 'rest' ? (S.auth?.name || 'Someone') : 'You (preview)';
+// Name is optional: typed in the notes box, remembered per browser, stamped on notes and phase changes.
+const NAME_KEY = 'pos360-rd-name';
+const me = () => ls.get(NAME_KEY, '') || (S.mode === 'rest' ? 'Team member' : 'You (preview)');
 
 /* ---------- main render ---------- */
 let filter = null, view = ls.get(VIEW_KEY, 'grid'), openId = null;
@@ -395,7 +398,7 @@ const sorted = list => list.slice().sort((a, b) => (a.order ?? 9e15) - (b.order 
 function render() {
   // who / sync
   $('#who').innerHTML = S.mode === 'rest' && S.auth
-    ? '<span class="dot' + (S.online === false ? ' off' : '') + '"></span>' + esc(S.auth.name) + ' <button class="linkbtn" id="signout">Switch</button>'
+    ? '<span class="dot' + (S.online === false ? ' off' : '') + '"></span>Signed in <button class="linkbtn" id="signout">Sign out</button>'
     : S.mode === 'preview' ? '<span class="dot off"></span>Preview' : '';
   const so = $('#signout'); if (so) so.onclick = () => { ls.set(AUTH_KEY, null); S.auth = null; showSignin(''); };
 
@@ -496,7 +499,7 @@ function renderDrawer() {
       (p.decision && p.decision !== 'pending' ? '<div class="f" style="max-width:200px"><label for="f-decisionDate">Decision date</label><input id="f-decisionDate" data-k="decisionDate" type="date" value="' + esc(p.decisionDate) + '"></div>' : '') +
       (p.decision !== 'approved' && passed(p) < PHASES.length ? '<div style="font-size:12px;color:var(--muted)">' + (PHASES.length - passed(p)) + ' phase' + (PHASES.length - passed(p) > 1 ? 's' : '') + ' still open before approval.</div>' : '') +
     '</div></div>' +
-    '<div class="sec notes"><h4>Notes and updates</h4><div class="addnote"><textarea id="noteText" placeholder="Share a test result, question or update…"></textarea><button class="btn sm" id="noteAdd">Post</button></div><div style="height:14px"></div>' +
+    '<div class="sec notes"><h4>Notes and updates</h4><div class="addnote"><input id="noteName" placeholder="Your name (optional)" value="' + esc(ls.get(NAME_KEY, '')) + '"><textarea id="noteText" placeholder="Share a test result, question or update…"></textarea><button class="btn sm" id="noteAdd">Post</button></div><div style="height:14px"></div>' +
       (notes.map(n => '<div class="n"><div class="h"><b>' + esc(n.by) + '</b> · ' + new Date(n.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) +
         (n.by === me() ? '<button class="del" data-delnote="' + esc(n.id) + '">Delete</button>' : '') + '</div><p>' + esc(n.text) + '</p></div>').join('') || '<div style="color:var(--faint);font-size:13px">No notes yet.</div>') +
     '</div></div>' +
@@ -542,6 +545,7 @@ function wireDrawer(p) {
   });
   $('#noteAdd').onclick = async () => {
     const text = $('#noteText').value.trim(); if (!text) return;
+    ls.set(NAME_KEY, $('#noteName').value.trim());
     const n = { id: 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), product: p.id, by: me(), at: Date.now(), text };
     S.notes.push(n);
     try { await db.put('notes', n.id, n); } catch (e) { S.notes.pop(); if (e.message !== 'auth') toast(e.message); }

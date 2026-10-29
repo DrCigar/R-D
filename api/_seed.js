@@ -3,8 +3,8 @@
 const ALL_PASS = { spec: { s: 'pass' }, bench: { s: 'pass' }, software: { s: 'pass' }, pilot: { s: 'pass' }, supply: { s: 'pass' } };
 
 // Product photos committed under img/<id>.png
-const PHOTOS = new Set(['pax-a6650', 'hanasis-floor', 'hanasis-counter', 'matsuda-counter', 'matsuda-floor', 'pax-a920-duo',
-  'pax-a360', 'pax-a380', 'inhand-ir602', 'inhand-ir624', 'aures-odp333']);
+const PHOTOS = new Set(['pax-a6650', 'pax-a6630', 'hanasis-floor', 'hanasis-counter', 'matsuda-counter', 'matsuda-floor', 'pax-a920-duo',
+  'pax-a360', 'pax-a380', 'inhand-ir602', 'inhand-ir624', 'aures-odp333', 'evo-sim.svg']);
 
 const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
@@ -16,7 +16,7 @@ const base = {
 export const SEED_PRODUCTS = [
   { id: 'pax-a6650', name: 'PAX A6650 Tablet', category: 'POS tablets', vendor: 'POSPortal', cost: 711,
     leadTime: '2 weeks', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-08-29', phases: ALL_PASS },
-  { id: 'pax-a630', name: 'PAX A630 Tablet', category: 'POS tablets', vendor: 'POSPortal', cost: 450,
+  { id: 'pax-a6630', name: 'PAX A6630 Tablet', category: 'POS tablets', vendor: 'POSPortal', cost: 450,
     demoStatus: 'inhouse' },
   { id: 'hanasis-floor', name: 'Amaze Hanasis Kiosk – Floor Standing', category: 'Kiosks', vendor: 'MS-Cash Drawer',
     cost: 1700, leadTime: '1 week', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-10-15', phases: ALL_PASS },
@@ -55,4 +55,4 @@ export const SEED_PRODUCTS = [
   { id: 'aures-odp333', name: 'Aures ODP 333 Receipt Printer', category: 'Printers', vendor: 'Aures',
     cost: 140, decision: 'approved', decisionDate: '2026-07-29', phases: ALL_PASS,
     pros: ['Big cost savings compared to Epson'] },
-].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));
+].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : PHOTOS.has(p.id + '.svg') ? 'img/' + p.id + '.svg' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));

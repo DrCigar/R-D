@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720">
+  <defs>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b2b2b"/><stop offset="1" stop-color="#0f0f0f"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4d58a"/><stop offset=".5" stop-color="#d4a640"/><stop offset="1" stop-color="#b8862b"/>
+    </linearGradient>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <!-- card with the clipped SIM corner -->
+  <path filter="url(#sh)" fill="url(#card)" d="M300 110h168a28 28 0 0 1 28 28v444a28 28 0 0 1-28 28H252a28 28 0 0 1-28-28V186z"/>
+  <!-- contact chip -->
+  <g transform="translate(278 300)">
+    <rect width="164" height="128" rx="16" fill="url(#gold)"/>
+    <g fill="none" stroke="#8a6420" stroke-width="5" stroke-linecap="round" opacity=".75">
+      <path d="M0 42h52M0 86h52M112 42h52M112 86h52"/>
+      <path d="M52 0v128M112 0v128"/>
+      <rect x="52" y="34" width="60" height="60" rx="10"/>
+    </g>
+  </g>
+  <!-- signal arcs -->
+  <g fill="none" stroke="#EF4023" stroke-width="10" stroke-linecap="round">
+    <path d="M330 520a42 42 0 0 1 60 0"/>
+    <path d="M310 498a72 72 0 0 1 100 0"/>
+  </g>
+  <circle cx="360" cy="544" r="9" fill="#EF4023"/>
+</svg>

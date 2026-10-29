@@ -19,6 +19,7 @@ Testing phases (in order): Spec and pricing review (SC Ops), Bench test (Systems
 
 - `src/rd.html` – the page (edit this one)
 - `api/_seed.js` – starter products, loaded once into an empty database
+- `img/` – product photos for the starter products (`<id>.png`)
 - `api/data.js`, `api/_db.js` – Neon-backed API (one `docs` table: `products`, `notes`, `photos`)
 - `build.mjs` – run `node build.mjs` to make `index.html` (the page Vercel serves). Commit `index.html`.
 
@@ -26,9 +27,9 @@ Testing phases (in order): Spec and pricing review (SC Ops), Bench test (Systems
 
 1. Import this repo in Vercel (Framework preset: **Other**, no build command).
 2. Storage → add **Neon** from the Marketplace and connect it to the project (sets `DATABASE_URL`).
-3. Settings → Environment Variables → add `RD_PASSWORD` (the team password).
+3. Settings → Environment Variables → add `RD_PASSWORD` set to the team password. (It lives only in Vercel, never in this repo.)
 4. Redeploy. On first load the database seeds itself with the starter products.
 
-Everyone signs in with their name plus the team password. The board refreshes every 30 seconds.
+Everyone signs in with just the team password. Adding a name is optional: type it in the box next to Notes and the browser remembers it for notes and phase stamps (otherwise they show "Team member"). The board refreshes every 30 seconds.
 
 Opened anywhere without the API (for example as a local file), the page runs in **preview mode**: it shows the starter data and saves changes only in that browser.
