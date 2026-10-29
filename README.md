@@ -27,9 +27,8 @@ Testing phases (in order): Spec and pricing review (SC Ops), Bench test (Systems
 
 1. Import this repo in Vercel (Framework preset: **Other**, no build command).
 2. Storage → add **Neon** from the Marketplace and connect it to the project (sets `DATABASE_URL`).
-3. Settings → Environment Variables → add `RD_PASSWORD` set to the team password. (It lives only in Vercel, never in this repo.)
-4. Redeploy. On first load the database seeds itself with the starter products.
+3. Redeploy. On first load the database seeds itself with the starter products.
 
-Everyone signs in with just the team password. Adding a name is optional: type it in the box next to Notes and the browser remembers it for notes and phase stamps (otherwise they show "Team member"). The board refreshes every 30 seconds.
+Everyone signs in with just the team password, which is set as `TEAM_PASSWORD` in `api/_db.js`. To change it, edit that line and push. Adding a name is optional: type it in the box next to Notes and the browser remembers it for notes and phase stamps (otherwise they show "Team member"). The board refreshes every 30 seconds.
 
 Opened anywhere without the API (for example as a local file), the page runs in **preview mode**: it shows the starter data and saves changes only in that browser.

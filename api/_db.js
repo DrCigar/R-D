@@ -1,5 +1,5 @@
 // Neon Postgres access for the API routes. Expects DATABASE_URL (set by the Neon
-// integration in the Vercel Marketplace) and RD_PASSWORD (the team password).
+// integration in the Vercel Marketplace). The team password is TEAM_PASSWORD below.
 import { neon } from '@neondatabase/serverless';
 import { createHash, timingSafeEqual } from 'crypto';
 import { SEED_PRODUCTS } from './_seed.js';
@@ -34,10 +34,12 @@ export function ensureSchema() {
 
 const digest = s => createHash('sha256').update(String(s)).digest();
 
+// Team password lives here in the code (Nate's call). An RD_PASSWORD env var in Vercel, if ever set, overrides it.
+const TEAM_PASSWORD = 'Payments123$';
+
 // Every request carries the team password in x-rd-key; compare in constant time.
 export function authorized(req) {
-  const want = process.env.RD_PASSWORD;
-  if (!want) throw Object.assign(new Error('RD_PASSWORD is not set'), { status: 500, expose: true });
+  const want = process.env.RD_PASSWORD || TEAM_PASSWORD;
   return timingSafeEqual(digest(req.headers['x-rd-key'] || ''), digest(want));
 }
 
