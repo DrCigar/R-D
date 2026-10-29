@@ -1,0 +1,615 @@
+<style>
+:root{
+  --black:#000;--ink:#0F0F0F;--verm:#EF4023;--verm-soft:#FDE7E3;--gray:#EBEBEB;
+  --bg:#F6F6F4;--card:#fff;--line:#E3E3E0;--muted:#6B6B68;--faint:#9A9A96;
+  --s-prelaunch:#2563EB;--s-awaiting:#7C3AED;--s-testing:#D97706;--s-approved:#15803D;--s-hold:#6B7280;--s-rejected:#B91C1C;
+  --ops:#0F766E;--sys:#4338CA;
+  --radius:14px;--shadow:0 1px 2px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.45 Figtree,system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+img{max-width:100%}
+
+/* header */
+.top{background:var(--black);color:#fff;border-left:6px solid var(--verm)}
+.top-in{max-width:1400px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.top img{height:30px;width:auto}
+.top h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
+.top .sub{color:#B5B5B5;font-size:13px;margin-top:2px}
+.top .grow{flex:1}
+.who{display:flex;align-items:center;gap:10px;font-size:13px;color:#ccc}
+.who .dot{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block}
+.who .dot.off{background:#F59E0B}
+.btn{border:0;border-radius:10px;padding:9px 16px;font-weight:600;background:var(--verm);color:#fff;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;color:inherit;border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--gray)}
+.top .btn.ghost{border-color:#444;color:#ddd}.top .btn.ghost:hover{background:#1a1a1a}
+.btn.danger{background:transparent;color:var(--s-rejected);border:1px solid #F1C7C7}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:8px}
+.linkbtn{background:none;border:0;color:#ddd;text-decoration:underline;padding:0;font-size:13px}
+
+.wrap{max-width:1400px;margin:0 auto;padding:22px 24px 60px}
+.banner{background:#FFF7E6;border:1px solid #F3D9A4;color:#7A4B00;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:13px}
+
+/* status tiles */
+.tiles{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px;text-align:left;position:relative;overflow:hidden;transition:transform .12s,box-shadow .12s}
+.tile:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.tile::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--c,var(--ink))}
+.tile .n{font-size:28px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.tile .l{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px}
+.tile.on{border-color:var(--c,var(--ink));box-shadow:0 0 0 2px var(--c,var(--ink)) inset}
+
+/* toolbar */
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.search{flex:1;min-width:200px;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px 10px 36px;outline:none}
+.search input:focus{border-color:var(--ink)}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:6px 12px;border-radius:7px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button.on{background:var(--ink);color:#fff}
+
+/* grid view */
+.cat{margin-bottom:30px}
+.cat-h{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+.cat-h h2{margin:0;font-size:17px;font-weight:700}
+.cat-h .c{color:var(--muted);font-size:13px}
+.cat-h .mini{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.ph{aspect-ratio:16/10;background:linear-gradient(135deg,#F1F1EE,#E6E6E2);position:relative;display:grid;place-items:center;color:#B9B9B4;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:contain;background:#fff}
+.ph .pill{position:absolute;top:10px;left:10px}
+.ph .hint{position:absolute;bottom:8px;right:10px;font-size:11px;color:var(--faint)}
+.cb{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+.cb .nm{font-weight:700;font-size:15px;line-height:1.25}
+.cb .vd{color:var(--muted);font-size:12.5px;margin-top:2px}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.facts div{padding:6px 8px;border-right:1px solid var(--line);min-width:0}
+.facts div:last-child{border-right:0}
+.facts .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600}
+.facts .v{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.facts .v.na{color:var(--faint);font-weight:500}
+.demo{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
+.demo i{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
+.demo.in i{background:var(--s-approved)}.demo.req i{background:var(--s-testing)}
+.prog{margin-top:auto}
+.segs{display:flex;gap:3px}
+.segs span{flex:1;height:6px;border-radius:3px;background:var(--gray)}
+.segs .pass{background:var(--s-approved)}.segs .active{background:var(--s-testing)}.segs .fail{background:var(--s-rejected)}
+.prog .pl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:5px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;font-size:12px;font-weight:700;background:#fff;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 35%,#fff);white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
+.pill.solid{background:var(--c);color:#fff;border-color:var(--c)}.pill.solid::before{background:#fff}
+
+/* pipeline */
+.pipe{display:grid;grid-template-columns:repeat(6,minmax(190px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}
+.col{background:#EFEFEC;border-radius:12px;padding:10px;min-height:200px}
+.col-h{display:flex;align-items:center;justify-content:space-between;padding:2px 4px 10px}
+.col-h b{font-size:13px}
+.col-h span{font-size:12px;color:var(--muted);font-weight:600}
+.mc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:10px;padding:10px 11px;margin-bottom:8px;width:100%;text-align:left;display:flex;gap:10px;align-items:center}
+.mc:hover{box-shadow:var(--shadow)}
+.mc .th{width:44px;height:44px;border-radius:8px;background:#F1F1EE;flex:none;display:grid;place-items:center;color:#B9B9B4;overflow:hidden}
+.mc .th img{width:100%;height:100%;object-fit:contain;background:#fff}
+.mc .t{font-weight:700;font-size:13px;line-height:1.25}
+.mc .s{font-size:11.5px;color:var(--muted)}
+.empty-col{font-size:12px;color:var(--faint);text-align:center;padding:20px 0}
+.none{padding:50px 0;text-align:center;color:var(--muted)}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;animation:fade .15s}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(640px,100vw);background:#fff;z-index:21;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.15);animation:slide .18s ease-out}
+@keyframes fade{from{opacity:0}}@keyframes slide{from{transform:translateX(30px);opacity:0}}
+.dh{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}
+.dh .grow{flex:1;min-width:0}
+.dh h3{margin:0;font-size:19px;line-height:1.25}
+.dh .meta{color:var(--muted);font-size:12.5px;margin-top:3px}
+.x{border:0;background:var(--gray);border-radius:8px;width:34px;height:34px;font-size:18px;line-height:1;flex:none}
+.db{overflow-y:auto;padding:18px 20px 30px;flex:1}
+.sec{margin-bottom:22px}
+.sec h4{margin:0 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.sec h4::before{content:"";width:3px;height:12px;background:var(--verm);border-radius:2px}
+.photo-row{display:flex;gap:14px;align-items:flex-start}
+.photo-box{width:180px;aspect-ratio:4/3;border-radius:12px;background:linear-gradient(135deg,#F1F1EE,#E6E6E2);display:grid;place-items:center;color:#B9B9B4;overflow:hidden;flex:none;border:1px solid var(--line)}
+.photo-box img{width:100%;height:100%;object-fit:contain;background:#fff}
+.photo-act{display:flex;flex-direction:column;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted)}
+.drop{outline:2px dashed var(--verm);outline-offset:3px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.f.full{grid-column:1/-1}
+.f label{font-size:12px;font-weight:600;color:var(--muted)}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:9px;padding:8px 10px;background:#fff;outline:none;width:100%}
+.f textarea{resize:vertical;min-height:70px}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--ink)}
+.money{position:relative}.money span{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)}.money input{padding-left:22px}
+.saved{font-size:12px;color:var(--s-approved);font-weight:600;opacity:0;transition:opacity .3s}
+.saved.show{opacity:1}
+
+.phase{border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;display:grid;grid-template-columns:28px 1fr;gap:4px 10px}
+.phase .num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:var(--gray);color:var(--muted)}
+.phase.pass .num{background:var(--s-approved);color:#fff}.phase.active .num{background:var(--s-testing);color:#fff}.phase.fail .num{background:var(--s-rejected);color:#fff}
+.phase .ttl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.phase .ttl b{font-size:14px}
+.team{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:5px;color:#fff;background:var(--ops)}
+.team.sys{background:var(--sys)}.team.both{background:linear-gradient(90deg,var(--ops),var(--sys))}
+.phase .desc{grid-column:2;font-size:12px;color:var(--muted)}
+.phase .ctl{grid-column:2;display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.chips{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.chips button{border:0;background:#fff;padding:5px 10px;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--line)}
+.chips button:last-child{border-right:0}
+.chips button.on[data-v=todo]{background:var(--gray);color:var(--ink)}
+.chips button.on[data-v=active]{background:var(--s-testing);color:#fff}
+.chips button.on[data-v=pass]{background:var(--s-approved);color:#fff}
+.chips button.on[data-v=fail]{background:var(--s-rejected);color:#fff}
+.chips button.on[data-v=pending]{background:var(--gray);color:var(--ink)}
+.chips button.on[data-v=approved]{background:var(--s-approved);color:#fff}
+.chips button.on[data-v=hold]{background:var(--s-hold);color:#fff}
+.chips button.on[data-v=rejected]{background:var(--s-rejected);color:#fff}
+.phase .stamp{font-size:11.5px;color:var(--faint)}
+.phase .note{grid-column:2;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12.5px;width:100%;outline:none;margin-top:4px}
+.phase .note:focus{border-color:var(--ink)}
+.decision{background:#FAFAF8;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.decision .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.notes .n{border-left:3px solid var(--gray);padding:4px 0 4px 12px;margin-bottom:12px}
+.notes .n .h{font-size:12px;color:var(--muted)}.notes .n .h b{color:var(--ink)}
+.notes .n p{margin:3px 0 0;white-space:pre-wrap}
+.notes .n .del{background:none;border:0;color:var(--faint);font-size:12px;padding:0;margin-left:6px}
+.addnote{display:flex;gap:8px;align-items:flex-end}
+.addnote textarea{flex:1;border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:44px;resize:vertical;outline:none}
+.df{padding:12px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+
+/* modal */
+.modal{position:fixed;inset:0;display:grid;place-items:center;z-index:30;background:rgba(0,0,0,.5);padding:16px}
+.modal form{background:#fff;border-radius:16px;padding:24px;width:min(420px,100%);display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h3{margin:0;font-size:19px}
+.modal p{margin:0;color:var(--muted);font-size:13px}
+.err{color:var(--s-rejected);font-size:13px;font-weight:600}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;z-index:40;box-shadow:var(--shadow)}
+
+@media (max-width:1100px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:640px){
+  .top-in,.wrap{padding-left:16px;padding-right:16px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fields{grid-template-columns:1fr}
+  .photo-row{flex-direction:column}
+  .cat-h .mini{display:none}
+}
+</style>
+
+<header class="top"><div class="top-in">
+  <img src="__LOGO__" alt="POS360">
+  <div>
+    <h1>Product R&amp;D Board</h1>
+    <div class="sub">Supply Chain Ops and Systems — testing new hardware before it's approved</div>
+  </div>
+  <div class="grow"></div>
+  <div class="who" id="who"></div>
+  <button class="btn" id="addBtn">+ Add product</button>
+</div></header>
+
+<main class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <div class="tiles" id="tiles"></div>
+  <div class="bar">
+    <label class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search products, vendors, notes…" aria-label="Search">
+    </label>
+    <div class="seg" id="viewSeg">
+      <button data-v="grid" class="on">By category</button>
+      <button data-v="pipe">Pipeline</button>
+    </div>
+  </div>
+  <div id="view"></div>
+</main>
+
+<div id="drawerHost"></div>
+
+<div class="modal" id="signin" hidden>
+  <form id="signinForm" autocomplete="on">
+    <h3>Sign in to the R&amp;D board</h3>
+    <p>Your name goes on the phases you update and the notes you leave.</p>
+    <div class="f"><label for="siName">Your name</label><input id="siName" required autocomplete="name"></div>
+    <div class="f"><label for="siKey">Team password</label><input id="siKey" type="password" required autocomplete="current-password"></div>
+    <div class="err" id="siErr" hidden></div>
+    <button class="btn" type="submit">Sign in</button>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+const SEED = __SEED__;
+const PHASES = [
+  { k: 'spec', t: 'Spec and pricing review', team: 'ops', d: 'Specs, cost, MOQ and lead time confirmed with the vendor.' },
+  { k: 'bench', t: 'Bench test', team: 'sys', d: 'Demo unit powered up, configured and stress-tested in house.' },
+  { k: 'software', t: 'Software and integration', team: 'sys', d: 'Works with our POS software, payments, peripherals and network.' },
+  { k: 'pilot', t: 'Field pilot', team: 'both', d: 'Installed at a live merchant; install steps and support load checked.' },
+  { k: 'supply', t: 'Supply sign-off', team: 'ops', d: 'Pricing locked, vendor set up, stocking plan and lead time agreed.' },
+];
+const TEAM = { ops: 'SC OPS', sys: 'SYSTEMS', both: 'BOTH TEAMS' };
+const STATUS = {
+  prelaunch: { l: 'Pre-launch', c: 'var(--s-prelaunch)' },
+  awaiting: { l: 'Awaiting demo', c: 'var(--s-awaiting)' },
+  testing: { l: 'In testing', c: 'var(--s-testing)' },
+  approved: { l: 'Approved', c: 'var(--s-approved)' },
+  hold: { l: 'On hold', c: 'var(--s-hold)' },
+  rejected: { l: 'Not approved', c: 'var(--s-rejected)' },
+};
+const ORDER = ['prelaunch', 'awaiting', 'testing', 'approved', 'hold', 'rejected'];
+const CAT_ORDER = ['POS tablets', 'Kiosks', 'Payment devices', 'Networking and connectivity'];
+const DEMO = { '': 'Not recorded', none: 'No demo unit yet', requested: 'Demo requested', inhouse: 'Demo in house', returned: 'Demo returned' };
+const AVAIL = { now: 'Available now', soon: 'Available soon', future: 'Launch date set', unknown: 'Launch date unknown' };
+const AUTH_KEY = 'pos360-rd-auth', PREVIEW_KEY = 'pos360-rd-preview-v1', VIEW_KEY = 'pos360-rd-view';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ls = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+             set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const today = () => new Date().toLocaleDateString('en-CA');
+const money = n => n == null || n === '' ? '' : '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 });
+function fmtDate(s) { if (!s) return ''; const d = new Date(s + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+function ago(s) {
+  if (!s) return ''; const days = Math.round((Date.now() - new Date(s + 'T12:00:00')) / 864e5);
+  if (days < 1) return 'today'; if (days < 14) return days + (days === 1 ? ' day ago' : ' days ago');
+  if (days < 60) return Math.round(days / 7) + ' weeks ago'; return Math.round(days / 30) + ' months ago';
+}
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
+
+/* ---------- status ---------- */
+function statusOf(p) {
+  if (p.decision === 'approved') return 'approved';
+  if (p.decision === 'rejected') return 'rejected';
+  if (p.decision === 'hold') return 'hold';
+  const started = PHASES.some(ph => (p.phases?.[ph.k]?.s || 'todo') !== 'todo');
+  if (p.demoStatus === 'inhouse' || p.demoStatus === 'returned' || started) return 'testing';
+  if (p.availability === 'future' || p.availability === 'unknown') return 'prelaunch';
+  return 'awaiting';
+}
+const passed = p => PHASES.filter(ph => p.phases?.[ph.k]?.s === 'pass').length;
+
+/* ---------- storage: rest (Vercel + Neon) or local preview ---------- */
+const S = { mode: 'loading', products: [], notes: [], photos: {}, auth: ls.get(AUTH_KEY, null) };
+
+async function call(method, qs, body) {
+  const r = await fetch('/api/data' + (qs ? '?' + new URLSearchParams(qs) : ''), {
+    method, headers: { 'content-type': 'application/json', 'x-rd-key': S.auth?.key || '' },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  let j = null; try { j = await r.json(); } catch {}
+  if (r.status === 401) { showSignin('That password didn’t work.'); throw new Error('auth'); }
+  if (!r.ok) throw new Error(j?.error || 'Request failed (' + r.status + ')');
+  return j;
+}
+const preview = {
+  load() {
+    const d = ls.get(PREVIEW_KEY, null);
+    if (d) return d;
+    const fresh = { products: SEED, notes: [], photos: {} }; ls.set(PREVIEW_KEY, fresh); return fresh;
+  },
+  save() { ls.set(PREVIEW_KEY, { products: S.products, notes: S.notes, photos: S.photos }); },
+};
+const db = {
+  async put(coll, id, doc) {
+    if (S.mode === 'rest') return call('PUT', { coll, id }, doc);
+    if (coll === 'photos') S.photos[id] = doc.data; preview.save();
+  },
+  async patch(coll, id, part) { if (S.mode === 'rest') return call('PATCH', { coll, id }, part); preview.save(); },
+  async del(coll, id) { if (S.mode === 'rest') return call('DELETE', { coll, id }); if (coll === 'photos') delete S.photos[id]; preview.save(); },
+};
+
+async function boot() {
+  let probe = null;
+  try { probe = await fetch('/api/data', { headers: { 'x-rd-key': S.auth?.key || '' } }); } catch {}
+  const isApi = probe && (probe.headers.get('content-type') || '').includes('application/json');
+  if (!isApi) {
+    S.mode = 'preview';
+    Object.assign(S, preview.load());
+    $('#banner').hidden = false;
+    $('#banner').innerHTML = '<b>Preview mode.</b> The shared database isn’t connected here, so changes save only in this browser. Deploy to Vercel with Neon to share with the team.';
+    render(); return;
+  }
+  S.mode = 'rest';
+  if (!S.auth || probe.status === 401) { showSignin(S.auth ? 'Sign in again to continue.' : ''); render(); return; }
+  await refresh(await probe.json());
+  setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 30000);
+}
+async function refresh(data) {
+  try {
+    data = data || await call('GET');
+    if (data.error) throw new Error(data.error);
+    S.products = data.products; S.notes = data.notes; S.online = true;
+  } catch (e) { if (e.message !== 'auth') { S.online = false; toast(e.message); } }
+  render(); if (openId && !$('#drawerHost').contains(document.activeElement)) renderDrawer();
+}
+async function photoOf(p) {
+  if (p.photoUrl) return p.photoUrl;
+  if (!p.photo) return '';
+  const key = p.id + ':' + p.photo.rev;
+  if (S.photos[key]) return S.photos[key];
+  if (S.mode === 'preview') return S.photos[p.id] || '';
+  const j = await call('GET', { coll: 'photos', id: p.id }).catch(() => null);
+  return (S.photos[key] = j?.data || '');
+}
+function hydratePhotos(root) {
+  root.querySelectorAll('[data-photo]').forEach(async el => {
+    const p = S.products.find(x => x.id === el.dataset.photo); if (!p) return;
+    const src = await photoOf(p);
+    if (src) el.innerHTML = '<img alt="" src="' + esc(src) + '">' + (el.dataset.keep ? el.dataset.keep : '');
+  });
+}
+
+/* ---------- sign-in ---------- */
+function showSignin(msg) {
+  $('#signin').hidden = false;
+  $('#siName').value = S.auth?.name || '';
+  $('#siErr').hidden = !msg; $('#siErr').textContent = msg || '';
+  setTimeout(() => ($('#siName').value ? $('#siKey') : $('#siName')).focus(), 30);
+}
+$('#signinForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  S.auth = { name: $('#siName').value.trim(), key: $('#siKey').value };
+  const r = await fetch('/api/data', { headers: { 'x-rd-key': S.auth.key } }).catch(() => null);
+  if (!r || r.status === 401) { $('#siErr').hidden = false; $('#siErr').textContent = 'That password didn’t work.'; return; }
+  ls.set(AUTH_KEY, S.auth); $('#signin').hidden = true; $('#siKey').value = '';
+  const j = await r.json();
+  if (!r.ok) { toast(j.error || 'Storage is not available'); return; }
+  await refresh(j);
+  if (!boot.polling) { boot.polling = setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 30000); }
+});
+const me = () => S.mode === 'rest' ? (S.auth?.name || 'Someone') : 'You (preview)';
+
+/* ---------- main render ---------- */
+let filter = null, view = ls.get(VIEW_KEY, 'grid'), openId = null;
+function icon(cat, size = 54) {
+  const c = (cat || '').toLowerCase(), s = 'width="' + size + '" height="' + size + '" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+  if (c.includes('kiosk')) return '<svg ' + s + '><rect x="14" y="4" width="20" height="28" rx="2"/><path d="M18 8h12v16H18zM24 32v8M16 44h16"/></svg>';
+  if (c.includes('payment') || c.includes('pin')) return '<svg ' + s + '><rect x="13" y="4" width="22" height="40" rx="3"/><rect x="17" y="9" width="14" height="10" rx="1"/><path d="M18 25h2M23 25h2M28 25h2M18 30h2M23 30h2M28 30h2M18 35h2M23 35h2M28 35h2"/></svg>';
+  if (c.includes('network') || c.includes('router') || c.includes('connect')) return '<svg ' + s + '><rect x="6" y="26" width="36" height="12" rx="3"/><path d="M14 26 10 12M34 26l4-14M13 32h2M19 32h2"/><path d="M19 15a7 7 0 0 1 10 0M16 11a12 12 0 0 1 16 0"/></svg>';
+  if (c.includes('tablet')) return '<svg ' + s + '><rect x="5" y="9" width="38" height="28" rx="3"/><path d="M10 14h28v18H10zM18 43h12M24 37v6"/></svg>';
+  return '<svg ' + s + '><path d="M24 4 42 14v20L24 44 6 34V14z"/><path d="M6 14l18 10 18-10M24 24v20"/></svg>';
+}
+function match(p) {
+  if (filter && statusOf(p) !== filter) return false;
+  const q = $('#q').value.trim().toLowerCase(); if (!q) return true;
+  const notes = S.notes.filter(n => n.product === p.id).map(n => n.text).join(' ');
+  return [p.name, p.vendor, p.category, p.costNote, p.launch, (p.pros || []).join(' '), (p.cons || []).join(' '), notes].join(' ').toLowerCase().includes(q);
+}
+function cats() {
+  const all = [...new Set(S.products.map(p => p.category || 'Uncategorized'))];
+  return all.sort((a, b) => { const ia = CAT_ORDER.indexOf(a), ib = CAT_ORDER.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b); });
+}
+const pill = (st, solid) => '<span class="pill' + (solid ? ' solid' : '') + '" style="--c:' + STATUS[st].c + '">' + STATUS[st].l + '</span>';
+const sorted = list => list.slice().sort((a, b) => (a.order ?? 9e15) - (b.order ?? 9e15) || a.name.localeCompare(b.name));
+
+function render() {
+  // who / sync
+  $('#who').innerHTML = S.mode === 'rest' && S.auth
+    ? '<span class="dot' + (S.online === false ? ' off' : '') + '"></span>' + esc(S.auth.name) + ' <button class="linkbtn" id="signout">Switch</button>'
+    : S.mode === 'preview' ? '<span class="dot off"></span>Preview' : '';
+  const so = $('#signout'); if (so) so.onclick = () => { ls.set(AUTH_KEY, null); S.auth = null; showSignin(''); };
+
+  // tiles
+  const counts = Object.fromEntries(ORDER.map(k => [k, 0]));
+  S.products.forEach(p => counts[statusOf(p)]++);
+  $('#tiles').innerHTML = '<button class="tile' + (!filter ? ' on' : '') + '" data-f=""><div class="n">' + S.products.length + '</div><div class="l">All products</div></button>' +
+    ORDER.map(k => '<button class="tile' + (filter === k ? ' on' : '') + '" data-f="' + k + '" style="--c:' + STATUS[k].c + '"><div class="n">' + counts[k] + '</div><div class="l">' + STATUS[k].l + '</div></button>').join('');
+
+  document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === view));
+  const list = sorted(S.products.filter(match));
+  const host = $('#view');
+  if (S.mode === 'loading') { host.innerHTML = ''; return; }
+  if (!list.length) { host.innerHTML = '<div class="none">' + (S.products.length ? 'Nothing matches that search or filter.' : 'No products yet. Add the first one.') + '</div>'; return; }
+
+  if (view === 'pipe') {
+    host.innerHTML = '<div class="pipe">' + ORDER.map(st => {
+      const items = list.filter(p => statusOf(p) === st);
+      return '<div class="col"><div class="col-h"><b>' + pill(st) + '</b><span>' + items.length + '</span></div>' +
+        (items.map(p => '<button class="mc" data-open="' + esc(p.id) + '" style="--c:' + STATUS[st].c + '"><div class="th" data-photo="' + esc(p.id) + '">' + icon(p.category, 26) + '</div>' +
+          '<div><div class="t">' + esc(p.name) + '</div><div class="s">' + esc(p.category || 'Uncategorized') + ' · ' + (st === 'approved' ? 'Approved ' + fmtDate(p.decisionDate) : passed(p) + ' of ' + PHASES.length + ' phases') + '</div></div></button>').join('')
+          || '<div class="empty-col">None</div>') + '</div>';
+    }).join('') + '</div>';
+  } else {
+    host.innerHTML = cats().map(cat => {
+      const items = list.filter(p => (p.category || 'Uncategorized') === cat); if (!items.length) return '';
+      const mini = ORDER.map(st => { const n = items.filter(p => statusOf(p) === st).length; return n ? '<span class="pill" style="--c:' + STATUS[st].c + '">' + n + ' ' + STATUS[st].l.toLowerCase() + '</span>' : ''; }).join('');
+      return '<section class="cat"><div class="cat-h"><h2>' + esc(cat) + '</h2><span class="c">' + items.length + ' product' + (items.length > 1 ? 's' : '') + '</span><div class="mini">' + mini + '</div></div><div class="grid">' + items.map(card).join('') + '</div></section>';
+    }).join('');
+  }
+  hydratePhotos(host);
+}
+function card(p) {
+  const st = statusOf(p), n = passed(p);
+  const fact = (k, v) => '<div><div class="k">' + k + '</div><div class="v' + (v ? '' : ' na') + '" title="' + esc(v) + '">' + (v ? esc(v) : '—') + '</div></div>';
+  const demoCls = p.demoStatus === 'inhouse' ? 'in' : p.demoStatus === 'requested' ? 'req' : '';
+  const demoTxt = DEMO[p.demoStatus || ''] + (p.demoDate ? ' · received ' + fmtDate(p.demoDate) : '') + (p.demoQty ? ' · qty ' + esc(p.demoQty) : '');
+  const progLbl = st === 'approved' ? '<span>Approved ' + (p.decisionDate ? ago(p.decisionDate) : '') + '</span><span>' + fmtDate(p.decisionDate) + '</span>'
+    : st === 'prelaunch' ? '<span>' + esc(p.launch || AVAIL[p.availability]) + '</span><span>' + n + '/' + PHASES.length + '</span>'
+    : '<span>' + n + ' of ' + PHASES.length + ' phases passed</span><span>' + (nextPhase(p) ? 'Next: ' + nextPhase(p).t : '') + '</span>';
+  return '<button class="card" data-open="' + esc(p.id) + '">' +
+    '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(st, true)) + '">' + icon(p.category) + pill(st, true) + '</div>' +
+    '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + (p.vendor ? esc(p.vendor) : 'Vendor not set') + '</div></div>' +
+    '<div class="facts">' + fact('Cost', money(p.cost) + (p.cost != null && p.costNote ? '*' : '')) + fact('Lead time', p.leadTime) + fact('MOQ', p.moq) + '</div>' +
+    '<div class="demo ' + demoCls + '"><i></i>' + demoTxt + '</div>' +
+    '<div class="prog"><div class="segs">' + PHASES.map(ph => '<span class="' + (p.phases?.[ph.k]?.s || 'todo') + '" title="' + esc(ph.t) + '"></span>').join('') + '</div><div class="pl">' + progLbl + '</div></div>' +
+    '</div></button>';
+}
+const nextPhase = p => PHASES.find(ph => p.phases?.[ph.k]?.s !== 'pass');
+
+/* ---------- drawer ---------- */
+function openDrawer(id) { openId = id; renderDrawer(); }
+function closeDrawer() { openId = null; $('#drawerHost').innerHTML = ''; document.body.style.overflow = ''; }
+function renderDrawer() {
+  const p = S.products.find(x => x.id === openId); if (!p) return closeDrawer();
+  const st = statusOf(p);
+  const keepScroll = $('#drawerHost .db')?.scrollTop || 0;
+  const notes = S.notes.filter(n => n.product === p.id).sort((a, b) => b.at - a.at);
+  const catOpts = [...new Set([...CAT_ORDER, ...S.products.map(x => x.category).filter(Boolean)])];
+  const fld = (k, label, attrs = '', full) => '<div class="f' + (full ? ' full' : '') + '"><label for="f-' + k + '">' + label + '</label><input id="f-' + k + '" data-k="' + k + '" value="' + esc(p[k] ?? '') + '" ' + attrs + '></div>';
+  const sel = (k, label, opts) => '<div class="f"><label for="f-' + k + '">' + label + '</label><select id="f-' + k + '" data-k="' + k + '">' + Object.entries(opts).map(([v, t]) => '<option value="' + v + '"' + ((p[k] || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>';
+  document.body.style.overflow = 'hidden';
+  $('#drawerHost').innerHTML = '<div class="scrim" data-close></div><aside class="drawer" role="dialog" aria-label="' + esc(p.name) + '">' +
+    '<div class="dh"><div class="grow"><h3>' + esc(p.name) + '</h3><div class="meta">' + pill(st) + ' &nbsp;' + esc(p.category || 'Uncategorized') + (p.vendor ? ' · ' + esc(p.vendor) : '') + '</div></div><span class="saved" id="saved">Saved</span><button class="x" data-close aria-label="Close">×</button></div>' +
+    '<div class="db">' +
+    '<div class="sec"><h4>Photo</h4><div class="photo-row"><div class="photo-box" id="photoBox" data-photo="' + esc(p.id) + '">' + icon(p.category, 60) + '</div>' +
+      '<div class="photo-act"><label class="btn ghost sm">Upload photo<input type="file" accept="image/*" id="photoFile" hidden></label>' +
+      'or drop an image on the box, or paste an image link:<input id="f-photoUrl" data-k="photoUrl" placeholder="https://…" value="' + esc(p.photoUrl) + '" style="border:1px solid var(--line);border-radius:8px;padding:6px 9px;width:100%">' +
+      ((p.photo || p.photoUrl) ? '<button class="btn danger sm" id="photoDel">Remove photo</button>' : '') + '</div></div></div>' +
+    '<div class="sec"><h4>Details</h4><div class="fields">' +
+      fld('name', 'Product name', 'required', true) +
+      '<div class="f"><label for="f-category">Category</label><input id="f-category" data-k="category" list="catList" value="' + esc(p.category) + '"><datalist id="catList">' + catOpts.map(c => '<option value="' + esc(c) + '">').join('') + '</datalist></div>' +
+      fld('vendor', 'Vendor') +
+      '<div class="f"><label for="f-cost">Cost per unit</label><div class="money"><span>$</span><input id="f-cost" data-k="cost" type="number" min="0" step="0.01" value="' + (p.cost ?? '') + '" placeholder="Unknown"></div></div>' +
+      fld('costNote', 'Cost note', 'placeholder="e.g. estimate, includes license"') +
+      fld('leadTime', 'Lead time', 'placeholder="e.g. 2 weeks"') +
+      fld('moq', 'MOQ', 'placeholder="Minimum order quantity"') +
+      sel('availability', 'Availability', AVAIL) +
+      fld('launch', 'Launch / availability note', 'placeholder="e.g. Launching Q2 2027"') +
+    '</div></div>' +
+    '<div class="sec"><h4>Demo unit</h4><div class="fields">' + sel('demoStatus', 'Status', DEMO) +
+      fld('demoDate', 'Date received', 'type="date"') + fld('demoQty', 'Units in house', 'placeholder="e.g. 2"') + '</div></div>' +
+    '<div class="sec"><h4>Pros and cons</h4><div class="fields">' +
+      '<div class="f"><label for="f-pros">Pros (one per line)</label><textarea id="f-pros" data-k="pros" data-list>' + esc((p.pros || []).join('\n')) + '</textarea></div>' +
+      '<div class="f"><label for="f-cons">Cons (one per line)</label><textarea id="f-cons" data-k="cons" data-list>' + esc((p.cons || []).join('\n')) + '</textarea></div></div></div>' +
+    '<div class="sec"><h4>Testing phases · ' + passed(p) + ' of ' + PHASES.length + ' passed</h4>' + PHASES.map((ph, i) => {
+      const s = p.phases?.[ph.k] || {}; const v = s.s || 'todo';
+      return '<div class="phase ' + v + '"><div class="num">' + (v === 'pass' ? '✓' : v === 'fail' ? '!' : i + 1) + '</div>' +
+        '<div class="ttl"><b>' + ph.t + '</b><span class="team ' + ph.team + '">' + TEAM[ph.team] + '</span></div>' +
+        '<div class="desc">' + ph.d + '</div>' +
+        '<div class="ctl"><div class="chips" data-phase="' + ph.k + '">' + [['todo', 'To do'], ['active', 'In progress'], ['pass', 'Passed'], ['fail', 'Failed']].map(([k, t]) => '<button data-v="' + k + '" class="' + (v === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
+        (s.by || s.date ? '<span class="stamp">' + esc([s.by, fmtDate(s.date)].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>' +
+        '<input class="note" data-pnote="' + ph.k + '" placeholder="Result or blocker…" value="' + esc(s.note) + '"></div>';
+    }).join('') + '</div>' +
+    '<div class="sec"><h4>Approval decision</h4><div class="decision"><div class="row"><div class="chips" id="decision">' +
+      [['pending', 'Pending'], ['approved', 'Approved'], ['hold', 'On hold'], ['rejected', 'Not approved']].map(([k, t]) => '<button data-v="' + k + '" class="' + ((p.decision || 'pending') === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
+      (p.decision && p.decision !== 'pending' ? '<span class="stamp" style="font-size:12px;color:var(--muted)">' + esc([p.decisionBy, fmtDate(p.decisionDate)].filter(Boolean).join(' · ')) + '</span>' : '') + '</div>' +
+      (p.decision && p.decision !== 'pending' ? '<div class="f" style="max-width:200px"><label for="f-decisionDate">Decision date</label><input id="f-decisionDate" data-k="decisionDate" type="date" value="' + esc(p.decisionDate) + '"></div>' : '') +
+      (p.decision !== 'approved' && passed(p) < PHASES.length ? '<div style="font-size:12px;color:var(--muted)">' + (PHASES.length - passed(p)) + ' phase' + (PHASES.length - passed(p) > 1 ? 's' : '') + ' still open before approval.</div>' : '') +
+    '</div></div>' +
+    '<div class="sec notes"><h4>Notes and updates</h4><div class="addnote"><textarea id="noteText" placeholder="Share a test result, question or update…"></textarea><button class="btn sm" id="noteAdd">Post</button></div><div style="height:14px"></div>' +
+      (notes.map(n => '<div class="n"><div class="h"><b>' + esc(n.by) + '</b> · ' + new Date(n.at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) +
+        (n.by === me() ? '<button class="del" data-delnote="' + esc(n.id) + '">Delete</button>' : '') + '</div><p>' + esc(n.text) + '</p></div>').join('') || '<div style="color:var(--faint);font-size:13px">No notes yet.</div>') +
+    '</div></div>' +
+    '<div class="df"><button class="btn danger sm" id="delProduct">Delete product</button><span style="font-size:12px;color:var(--faint)">Added by ' + esc(p.createdBy || '—') + '</span></div></aside>';
+  $('#drawerHost .db').scrollTop = keepScroll;
+  if (keepScroll) $('#drawerHost .drawer').style.animation = 'none';
+  hydratePhotos($('#drawerHost'));
+  wireDrawer(p);
+}
+function flashSaved() { const s = $('#saved'); if (!s) return; s.classList.add('show'); clearTimeout(flashSaved.h); flashSaved.h = setTimeout(() => s.classList.remove('show'), 1200); }
+async function patch(p, part, rerender = true) {
+  Object.assign(p, part);
+  try { await db.patch('products', p.id, part); flashSaved(); } catch (e) { if (e.message !== 'auth') toast(e.message); }
+  render(); if (rerender) renderDrawer();
+}
+function wireDrawer(p) {
+  const host = $('#drawerHost');
+  host.querySelectorAll('[data-close]').forEach(b => b.onclick = closeDrawer);
+  host.querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('change', () => {
+    const k = inp.dataset.k; let v = inp.value;
+    if (k === 'cost') v = v === '' ? null : Number(v);
+    else if (inp.hasAttribute('data-list')) v = v.split('\n').map(s => s.trim()).filter(Boolean);
+    else v = v.trim();
+    if (k === 'name' && !v) { inp.value = p.name; return; }
+    patch(p, { [k]: v }, ['name', 'category', 'vendor', 'availability', 'demoStatus', 'photoUrl'].includes(k));
+  }));
+  host.querySelectorAll('[data-phase] button').forEach(b => b.onclick = () => {
+    const k = b.closest('[data-phase]').dataset.phase;
+    const phases = { ...(p.phases || {}) };
+    phases[k] = { ...(phases[k] || {}), s: b.dataset.v, by: me(), date: today() };
+    if (b.dataset.v === 'todo') { delete phases[k].by; delete phases[k].date; }
+    patch(p, { phases });
+  });
+  host.querySelectorAll('[data-pnote]').forEach(inp => inp.addEventListener('change', () => {
+    const k = inp.dataset.pnote; const phases = { ...(p.phases || {}) };
+    phases[k] = { ...(phases[k] || { s: 'todo' }), note: inp.value.trim() };
+    patch(p, { phases }, false);
+  }));
+  host.querySelectorAll('#decision button').forEach(b => b.onclick = () => {
+    const v = b.dataset.v;
+    if (v === 'approved' && passed(p) < PHASES.length && !confirm('Only ' + passed(p) + ' of ' + PHASES.length + ' testing phases are marked passed. Approve anyway?')) return;
+    patch(p, v === 'pending' ? { decision: 'pending', decisionDate: '', decisionBy: '' } : { decision: v, decisionDate: today(), decisionBy: me() });
+  });
+  $('#noteAdd').onclick = async () => {
+    const text = $('#noteText').value.trim(); if (!text) return;
+    const n = { id: 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), product: p.id, by: me(), at: Date.now(), text };
+    S.notes.push(n);
+    try { await db.put('notes', n.id, n); } catch (e) { S.notes.pop(); if (e.message !== 'auth') toast(e.message); }
+    renderDrawer();
+  };
+  host.querySelectorAll('[data-delnote]').forEach(b => b.onclick = async () => {
+    const id = b.dataset.delnote; S.notes = S.notes.filter(n => n.id !== id);
+    await db.del('notes', id).catch(e => toast(e.message)); renderDrawer();
+  });
+  $('#delProduct').onclick = async () => {
+    if (!confirm('Delete ' + p.name + ' and its notes? This can’t be undone.')) return;
+    S.products = S.products.filter(x => x.id !== p.id); S.notes = S.notes.filter(n => n.product !== p.id);
+    if (S.mode === 'preview') delete S.photos[p.id];
+    await db.del('products', p.id).catch(e => toast(e.message)); closeDrawer(); render();
+  };
+  // photo upload / drop
+  const box = $('#photoBox');
+  const take = f => f && f.type.startsWith('image/') && setPhoto(p, f);
+  $('#photoFile').onchange = e => take(e.target.files[0]);
+  box.ondragover = e => { e.preventDefault(); box.classList.add('drop'); };
+  box.ondragleave = () => box.classList.remove('drop');
+  box.ondrop = e => { e.preventDefault(); box.classList.remove('drop'); take(e.dataTransfer.files[0]); };
+  const pd = $('#photoDel'); if (pd) pd.onclick = async () => {
+    if (p.photo) await db.del('photos', p.id).catch(() => {});
+    patch(p, { photo: null, photoUrl: '' });
+  };
+}
+function shrink(file, max = 720) {
+  return new Promise((res, rej) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .82));
+    };
+    img.onerror = () => rej(new Error('Couldn’t read that image'));
+    img.src = url;
+  });
+}
+async function setPhoto(p, file) {
+  try {
+    const data = await shrink(file); const rev = Date.now();
+    await db.put('photos', p.id, { data });
+    S.photos[p.id + ':' + rev] = data;
+    await patch(p, { photo: { rev }, photoUrl: '' });
+  } catch (e) { if (e.message !== 'auth') toast(e.message); }
+}
+
+/* ---------- add product ---------- */
+$('#addBtn').onclick = async () => {
+  if (S.mode === 'rest' && !S.auth) return showSignin('');
+  const name = prompt('Product name'); if (!name || !name.trim()) return;
+  const id = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) + '-' + Math.random().toString(36).slice(2, 6);
+  const p = { id, name: name.trim(), category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '', availability: 'now', launch: '',
+    pros: [], cons: [], demoStatus: 'none', demoDate: '', demoQty: '', decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '',
+    order: Date.now(), createdAt: Date.now(), createdBy: me() };
+  S.products.push(p);
+  try { await db.put('products', id, p); } catch (e) { S.products.pop(); if (e.message !== 'auth') toast(e.message); return; }
+  render(); openDrawer(id); setTimeout(() => $('#f-category')?.focus(), 50);
+};
+
+/* ---------- events ---------- */
+$('#tiles').onclick = e => { const t = e.target.closest('[data-f]'); if (!t) return; filter = t.dataset.f || null; render(); };
+$('#viewSeg').onclick = e => { const b = e.target.closest('button'); if (!b) return; view = b.dataset.v; ls.set(VIEW_KEY, view); render(); };
+$('#q').oninput = render;
+$('#view').onclick = e => { const c = e.target.closest('[data-open]'); if (c) openDrawer(c.dataset.open); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && openId) closeDrawer(); });
+
+boot();
+})();
+</script>
