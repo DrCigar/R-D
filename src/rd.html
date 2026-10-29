@@ -313,17 +313,20 @@ async function boot() {
   let probe = null;
   try { probe = await fetch('/api/data', { headers: { 'x-rd-key': S.auth?.key || '' } }); } catch {}
   const isApi = probe && (probe.headers.get('content-type') || '').includes('application/json');
-  if (!isApi) {
-    S.mode = 'preview';
-    Object.assign(S, preview.load());
-    $('#banner').hidden = false;
-    $('#banner').innerHTML = '<b>Preview mode.</b> The shared database isn’t connected here, so changes save only in this browser. Deploy to Vercel with Neon to share with the team.';
-    render(); return;
-  }
+  if (!isApi) return localOnly();
   S.mode = 'rest';
   if (!S.auth || probe.status === 401) { showSignin(S.auth ? 'Sign in again to continue.' : ''); render(); return; }
+  if (probe.status >= 500) return localOnly();
   await refresh(await probe.json());
   setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 30000);
+}
+// No shared storage reachable: show the starter products and keep edits in this browser.
+function localOnly() {
+  S.mode = 'preview';
+  Object.assign(S, preview.load());
+  $('#banner').hidden = false;
+  $('#banner').innerHTML = '<b>Not shared yet.</b> No storage is connected, so changes save only in this browser.';
+  render();
 }
 async function refresh(data) {
   try {
@@ -363,7 +366,7 @@ $('#signinForm').addEventListener('submit', async e => {
   if (!r || r.status === 401) { $('#siErr').hidden = false; $('#siErr').textContent = 'That password didn’t work.'; return; }
   ls.set(AUTH_KEY, S.auth); $('#signin').hidden = true; $('#siKey').value = '';
   const j = await r.json();
-  if (!r.ok) { toast(j.error || 'Storage is not available'); return; }
+  if (!r.ok) return localOnly();
   await refresh(j);
   if (!boot.polling) { boot.polling = setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 30000); }
 });
