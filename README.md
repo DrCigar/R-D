@@ -21,14 +21,14 @@ Testing phases (in order): Spec and pricing review (SC Ops), Bench test (Systems
 - `api/_seed.js` – starter products, loaded once into an empty database
 - `img/` – product photos for the starter products (`<id>.png`)
 
-Attached files (vendor proposals, spec sheets; up to 3 MB, one per product) are uploaded inside the app and kept in the private Blob store as `rd/docs/<id>.json`, never in this repo.
-- `api/data.js`, `api/_db.js` – API on Vercel Blob: the whole board is one private file, `rd/board.json`; uploaded photos are `rd/photos/<id>.json`. Saves only go through if nobody else saved in between (otherwise it re-reads and retries), so two people editing at once don't overwrite each other.
+Attached files (vendor proposals, spec sheets; up to 3 MB, one per product) are uploaded inside the app and kept in that storage, never in this repo.
+- `api/data.js`, `api/_db.js` – the API. Storage is picked automatically: **Neon** when `DATABASE_URL` is set (one table, `rd_store`), otherwise a private **Vercel Blob** store. Either way the board is one JSON document, and a save only lands if nobody else saved in between (otherwise it re-reads and retries), so two people editing at once don't overwrite each other.
 - `build.mjs` – run `node build.mjs` to make `index.html` (the page Vercel serves). Commit `index.html`.
 
 ## Deploy on Vercel
 
 1. Import this repo in Vercel (Framework preset: **Other**, no build command).
-2. Storage → **Create** → **Blob**, choose **Private**, and connect it to the project. No keys to copy; Vercel wires it up.
+2. Storage → connect **Neon** (or a private **Blob** store) to the project. No keys to copy; Vercel wires it up.
 3. Redeploy. Until the first edit, the board shows the starter products; the first save creates the board file.
 
 Everyone signs in with just the team password, which is set as `TEAM_PASSWORD` in `api/_db.js`. To change it, edit that line and push. Adding a name is optional: type it in the box next to Notes and the browser remembers it for notes and phase stamps (otherwise they show "Team member"). The board refreshes every 30 seconds.

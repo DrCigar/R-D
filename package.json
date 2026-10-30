@@ -2,11 +2,12 @@
   "name": "rd-dashboard",
   "private": true,
   "type": "module",
-  "description": "POS360 product R&D board for Supply Chain Ops and Systems: static page at the root, Vercel Blob-backed API under /api.",
+  "description": "POS360 product R&D board for Supply Chain Ops and Systems: static page at the root, API under /api on Neon or Vercel Blob.",
   "scripts": {
     "build:page": "node build.mjs"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "@vercel/blob": "^2.8.2"
   }
 }
