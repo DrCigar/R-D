@@ -10,7 +10,7 @@ const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '',
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null,
 };
 
 export const SEED_PRODUCTS = [
@@ -55,4 +55,9 @@ export const SEED_PRODUCTS = [
   { id: 'aures-odp333', name: 'Aures ODP 333 Receipt Printer', category: 'Printers', vendor: 'Aures',
     cost: 140, decision: 'approved', decisionDate: '2026-07-29', phases: ALL_PASS,
     pros: ['Big cost savings compared to Epson'] },
+  { id: 'pkg-360pro-brown', name: '360 Pro Packaging Redesign', category: 'Foam and packaging', vendor: 'Brown Packaging',
+    pros: ['Shipping cube 7.19 → 4.80 ft³ (33.2% smaller)', 'Foam 3.04 → 1.54 ft³ (49.6% less)',
+      'Carton 20.75 × 19.75 × 20.25 in (was 22.75 × 22.75 × 24)', 'Drops the lower foam pad and the foam around the lower box',
+      'Faster assembly: lower box no longer has to be centered before the foam slides on',
+      'Branded lower box, no tape needed', 'Cleaner, more tailored top foam'] },
 ].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : PHOTOS.has(p.id + '.svg') ? 'img/' + p.id + '.svg' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));

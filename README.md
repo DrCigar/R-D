@@ -20,15 +20,17 @@ Testing phases (in order): Spec and pricing review (SC Ops), Bench test (Systems
 - `src/rd.html` – the page (edit this one)
 - `api/_seed.js` – starter products, loaded once into an empty database
 - `img/` – product photos for the starter products (`<id>.png`)
-- `api/data.js`, `api/_db.js` – Neon-backed API (one `docs` table: `products`, `notes`, `photos`)
+
+Attached files (vendor proposals, spec sheets; up to 3 MB, one per product) are uploaded inside the app and kept in the private Blob store as `rd/docs/<id>.json`, never in this repo.
+- `api/data.js`, `api/_db.js` – API on Vercel Blob: the whole board is one private file, `rd/board.json`; uploaded photos are `rd/photos/<id>.json`. Saves only go through if nobody else saved in between (otherwise it re-reads and retries), so two people editing at once don't overwrite each other.
 - `build.mjs` – run `node build.mjs` to make `index.html` (the page Vercel serves). Commit `index.html`.
 
 ## Deploy on Vercel
 
 1. Import this repo in Vercel (Framework preset: **Other**, no build command).
-2. Storage → add **Neon** from the Marketplace and connect it to the project (sets `DATABASE_URL`).
-3. Redeploy. On first load the database seeds itself with the starter products.
+2. Storage → **Create** → **Blob**, choose **Private**, and connect it to the project. No keys to copy; Vercel wires it up.
+3. Redeploy. Until the first edit, the board shows the starter products; the first save creates the board file.
 
 Everyone signs in with just the team password, which is set as `TEAM_PASSWORD` in `api/_db.js`. To change it, edit that line and push. Adding a name is optional: type it in the box next to Notes and the browser remembers it for notes and phase stamps (otherwise they show "Team member"). The board refreshes every 30 seconds.
 
-Opened anywhere without the API (for example as a local file), the page runs in **preview mode**: it shows the starter data and saves changes only in that browser.
+Opened anywhere without the API or a connected Blob store, the page shows the starter products and keeps changes only in that browser (a banner says so).
