@@ -29,6 +29,7 @@ export const SEED_PRODUCTS = [
   { id: 'pax-a3700', name: 'PAX A3700 Pin Pad', category: 'Pin pads and terminals', vendor: 'POS Portal', cost: 390,
     decision: 'approved', decisionDate: '2025-01-01', phases: ALL_PASS,
     quotes: [{ vendor: 'POS Portal', price: 390 }, { vendor: 'TRG', price: 425 }, { vendor: 'DCC', price: 450 }] },
+  { id: 'pax-a3700-hub', name: 'PAX A3700 Hub (T3400)', category: 'Pin pads and terminals', vendor: 'DCC' },
   { id: 'pax-a920-duo', name: 'PAX A920 Duo', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'soon', launch: 'Available to purchase soon', demoStatus: 'none',
     pros: ['Customer-facing price screen', 'Replaces the A920'] },
@@ -67,8 +68,14 @@ export const SEED_PRODUCTS = [
       'Branded lower box, no tape needed', 'Cleaner, more tailored top foam'] },
 ].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : PHOTOS.has(p.id + '.svg') ? 'img/' + p.id + '.svg' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));
 
-// One-time updates for boards that were already saved before a change to the starter data.
-// Each runs once per board (its id is recorded in board.applied) and only touches the fields it names.
+// One-time updates. Each runs once per saved board (its id is recorded in board.applied) and only
+// touches the fields it names. startingBoard() runs them all on the starter list, so a change only
+// has to be written here to reach both fresh boards and boards already saved.
+const quote = (p, vendor, price, note) => {
+  if (!p) return;
+  const qs = (p.quotes || []).filter(q => (q.vendor || '').toLowerCase() !== vendor.toLowerCase());
+  p.quotes = [...qs, { vendor, price, note }];
+};
 export const UPDATES = [
   { id: '2026-11-02-vendor-quotes', apply(board) {
     const set = (id, part) => { if (board.products[id]) Object.assign(board.products[id], part); };
@@ -82,4 +89,27 @@ export const UPDATES = [
       board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
     }
   } },
+  { id: '2026-11-02-dcc-bulk', apply(board) {
+    const P = board.products;
+    if (!P['pax-a3700-hub']) {
+      const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'pax-a3700-hub');
+      P[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
+    }
+    quote(P['pax-a3700'], 'DCC', 409, 'Bulk 25+ ($489 under 25) · 44 on hand');
+    quote(P['pax-a3700-hub'], 'DCC', 70, 'Bulk 25+ ($79 under 25) · 74 on hand');
+    quote(P['pax-a6650'], 'DCC', 705, 'Bulk 25+ ($865 under 25; was $709) · 110 on hand');
+    quote(P['pax-a6630'], 'DCC', 349, 'Bulk 25+ ($405 under 25) · 12 on hand, 200 inbound this month or next');
+    const duo = P['pax-a920-duo'];
+    if (duo) {
+      quote(duo, 'DCC', 389, 'Bulk 25+ ($409 under 25) · 480 on hand');
+      Object.assign(duo, { name: 'PAX A920Pro Duo', availability: 'now', launch: 'DCC has 480 on hand; demo unit needed' });
+    }
+  } },
 ];
+
+export function startingBoard() {
+  const board = { products: Object.fromEntries(SEED_PRODUCTS.map(({ id, ...p }) => [id, structuredClone(p)])), notes: {}, applied: [] };
+  for (const u of UPDATES) u.apply(board);
+  board.applied = UPDATES.map(u => u.id);
+  return board;
+}

@@ -7,13 +7,12 @@
 import { get, put, del, BlobPreconditionFailedError } from '@vercel/blob';
 import { neon } from '@neondatabase/serverless';
 import { createHash, timingSafeEqual } from 'crypto';
-import { SEED_PRODUCTS, UPDATES } from './_seed.js';
+import { UPDATES, startingBoard } from './_seed.js';
 
 // Team password lives here in the code (Nate's call). An RD_PASSWORD env var in Vercel, if ever set, overrides it.
 const TEAM_PASSWORD = 'Payments123$';
 
-// Starter data already includes every update, so a fresh board marks them all as applied.
-const seedBoard = () => ({ products: Object.fromEntries(SEED_PRODUCTS.map(({ id, ...p }) => [id, p])), notes: {}, applied: UPDATES.map(u => u.id) });
+const seedBoard = startingBoard; // starter products with every update already applied
 const CONFLICT = Symbol('conflict');
 
 /* ---------- Neon ---------- */

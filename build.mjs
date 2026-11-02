@@ -1,12 +1,12 @@
 // Builds index.html (the Vercel page) from src/rd.html with the logo and starter data embedded.
 import { readFileSync, writeFileSync } from "node:fs";
-import { SEED_PRODUCTS } from "./api/_seed.js";
+import { startingBoard } from "./api/_seed.js";
 
 const src = readFileSync("src/rd.html", "utf8");
 const logo = readFileSync("src/assets/pos360-logo-white-only.png").toString("base64");
 const body = src
   .replace("__LOGO__", "data:image/png;base64," + logo)
-  .replace("__SEED__", JSON.stringify(SEED_PRODUCTS));
+  .replace("__SEED__", JSON.stringify(Object.entries(startingBoard().products).map(([id, p]) => ({ ...p, id }))));
 new Function(body.split("<script>")[1].split("</script>")[0]); // syntax check
 
 const page = `<!doctype html>
