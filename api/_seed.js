@@ -3,14 +3,14 @@
 const ALL_PASS = { spec: { s: 'pass' }, bench: { s: 'pass' }, software: { s: 'pass' }, pilot: { s: 'pass' }, supply: { s: 'pass' } };
 
 // Product photos committed under img/<id>.png
-const PHOTOS = new Set(['pax-a6650', 'pax-a6630', 'hanasis-floor', 'hanasis-counter', 'matsuda-counter', 'matsuda-floor', 'pax-a920-duo',
+const PHOTOS = new Set(['pax-a6650', 'pax-a6630', 'pax-a3700', 'hanasis-floor', 'hanasis-counter', 'matsuda-counter', 'matsuda-floor', 'pax-a920-duo',
   'pax-a360', 'pax-a380', 'inhand-ir602', 'inhand-ir624', 'aures-odp333', 'evo-sim.svg']);
 
 const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [],
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false,
 };
 
 export const SEED_PRODUCTS = [
@@ -26,12 +26,15 @@ export const SEED_PRODUCTS = [
     cost: 1500, leadTime: '1 week', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-10-15', phases: ALL_PASS },
   { id: 'matsuda-counter', name: 'Matsuda Countertop Kiosk', category: 'Kiosks', vendor: 'Matsuda',
     cost: 615, leadTime: '12 weeks', decision: 'approved', decisionDate: '2026-10-01', phases: ALL_PASS },
-  { id: 'pax-a920-duo', name: 'PAX A920 Duo', category: 'Payment devices', vendor: 'PAX',
+  { id: 'pax-a3700', name: 'PAX A3700 Pin Pad', category: 'Pin pads and terminals', vendor: 'POS Portal', cost: 390,
+    decision: 'approved', decisionDate: '2025-01-01', phases: ALL_PASS,
+    quotes: [{ vendor: 'POS Portal', price: 390 }, { vendor: 'TRG', price: 425 }, { vendor: 'DCC', price: 450 }] },
+  { id: 'pax-a920-duo', name: 'PAX A920 Duo', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'soon', launch: 'Available to purchase soon', demoStatus: 'none',
     pros: ['Customer-facing price screen', 'Replaces the A920'] },
-  { id: 'pax-a360', name: 'PAX A360 Pin Pad', category: 'Payment devices', vendor: 'PAX',
+  { id: 'pax-a360', name: 'PAX A360 Pin Pad', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'unknown', launch: 'Details and launch date not yet known', demoStatus: 'none' },
-  { id: 'pax-a380', name: 'PAX A380 Pin Pad', category: 'Payment devices', vendor: 'PAX',
+  { id: 'pax-a380', name: 'PAX A380 Pin Pad', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'unknown' },
   { id: 'evo-sim', name: 'EVO SIM Card for Cradlepoint Routers', category: 'Networking and connectivity', vendor: 'Mobility Help Desk',
     demoStatus: 'inhouse',
@@ -71,5 +74,12 @@ export const UPDATES = [
     const set = (id, part) => { if (board.products[id]) Object.assign(board.products[id], part); };
     set('pax-a6650', { vendor: 'POS Portal', quotes: [{ vendor: 'TRG', price: 680 }, { vendor: 'DCC', price: 709 }, { vendor: 'POS Portal', price: 711 }] });
     set('pax-a6630', { vendor: 'POS Portal', cost: 360, quotes: [{ vendor: 'POS Portal', price: 360 }] });
+  } },
+  { id: '2026-11-02-a3700-pin-pads', apply(board) {
+    for (const p of Object.values(board.products)) if (p.category === 'Payment devices') p.category = 'Pin pads and terminals';
+    if (!board.products['pax-a3700']) {
+      const seed = SEED_PRODUCTS.find(p => p.id === 'pax-a3700'); const { id, ...doc } = seed;
+      board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
+    }
   } },
 ];
