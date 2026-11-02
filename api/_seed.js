@@ -29,7 +29,6 @@ export const SEED_PRODUCTS = [
   { id: 'pax-a3700', name: 'PAX A3700 Pin Pad', category: 'Pin pads and terminals', vendor: 'POS Portal', cost: 390,
     decision: 'approved', decisionDate: '2025-01-01', phases: ALL_PASS,
     quotes: [{ vendor: 'POS Portal', price: 390 }, { vendor: 'TRG', price: 425 }, { vendor: 'DCC', price: 450 }] },
-  { id: 'pax-a3700-hub', name: 'PAX A3700 Hub (T3400)', category: 'Pin pads and terminals', vendor: 'DCC' },
   { id: 'pax-a920-duo', name: 'PAX A920 Duo', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'soon', launch: 'Available to purchase soon', demoStatus: 'none',
     pros: ['Customer-facing price screen', 'Replaces the A920'] },
@@ -56,6 +55,8 @@ export const SEED_PRODUCTS = [
       'Lowest latency (URLLC-capable)', 'Works on 5G SA and NSA networks'],
     cons: ['Premium module cost', 'Higher power draw, larger unit',
       'Built for HD video, gigabit edge and high density, more than a typical store needs'] },
+  { id: 'pax-kiosk', name: 'PAX Kiosk', category: 'Kiosks', vendor: 'PAX',
+    availability: 'future', launch: 'Available late 2027 (TRG)', leadTime: '12–16 weeks (TRG)', demoStatus: 'none' },
   { id: 'matsuda-floor', name: 'Matsuda K300-215 Floor Standing Kiosk', category: 'Kiosks', vendor: 'Matsuda',
     cost: 900, leadTime: '12 weeks', demoStatus: 'inhouse' },
   { id: 'aures-odp333', name: 'Aures ODP 333 Receipt Printer', category: 'Printers', vendor: 'Aures',
@@ -91,18 +92,37 @@ export const UPDATES = [
   } },
   { id: '2026-11-02-dcc-bulk', apply(board) {
     const P = board.products;
-    if (!P['pax-a3700-hub']) {
-      const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'pax-a3700-hub');
-      P[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
-    }
     quote(P['pax-a3700'], 'DCC', 409, 'Bulk 25+ ($489 under 25) · 44 on hand');
-    quote(P['pax-a3700-hub'], 'DCC', 70, 'Bulk 25+ ($79 under 25) · 74 on hand');
     quote(P['pax-a6650'], 'DCC', 705, 'Bulk 25+ ($865 under 25; was $709) · 110 on hand');
     quote(P['pax-a6630'], 'DCC', 349, 'Bulk 25+ ($405 under 25) · 12 on hand, 200 inbound this month or next');
     const duo = P['pax-a920-duo'];
     if (duo) {
       quote(duo, 'DCC', 389, 'Bulk 25+ ($409 under 25) · 480 on hand');
       Object.assign(duo, { name: 'PAX A920Pro Duo', availability: 'now', launch: 'DCC has 480 on hand; demo unit needed' });
+    }
+  } },
+  // Nate: leave the A3700 Hub off the board (an earlier version of the update above added it)
+  { id: '2026-11-02-remove-a3700-hub', apply(board) {
+    delete board.products['pax-a3700-hub'];
+    for (const [id, n] of Object.entries(board.notes || {})) if (n.product === 'pax-a3700-hub') delete board.notes[id];
+  } },
+  { id: '2026-11-02-trg-pricing', apply(board) {
+    const P = board.products;
+    if (!P['pax-kiosk']) {
+      const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'pax-kiosk');
+      P[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
+    }
+    const lead = (p, t) => { if (p && !p.leadTime) p.leadTime = t + ' (TRG)'; }; // only fills an empty box
+    quote(P['pax-a3700'], 'TRG', 419, 'On hand · 4–12 weeks lead time'); lead(P['pax-a3700'], '4–12 weeks');
+    quote(P['pax-a6650'], 'TRG', 682, 'On hand · 4–12 weeks lead time');
+    quote(P['pax-a6630'], 'TRG', 340, 'On hand · 8–12 weeks lead time'); lead(P['pax-a6630'], '8–12 weeks');
+    quote(P['pax-a920-duo'], 'TRG', 363, 'On hand · 4–12 weeks lead time'); lead(P['pax-a920-duo'], '4–12 weeks');
+    quote(P['pax-kiosk'], 'TRG', null, 'Available late 2027 · 12–16 weeks lead time · no price yet');
+    for (const id of ['pax-a360', 'pax-a380']) {
+      const p = P[id]; if (!p) continue;
+      quote(p, 'TRG', id === 'pax-a360' ? 347 : 443, 'Available in January · 4–12 weeks lead time');
+      lead(p, '4–12 weeks');
+      Object.assign(p, { availability: 'future', launch: 'Available in January (TRG)' });
     }
   } },
 ];
