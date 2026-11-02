@@ -7,12 +7,13 @@
 import { get, put, del, BlobPreconditionFailedError } from '@vercel/blob';
 import { neon } from '@neondatabase/serverless';
 import { createHash, timingSafeEqual } from 'crypto';
-import { SEED_PRODUCTS } from './_seed.js';
+import { SEED_PRODUCTS, UPDATES } from './_seed.js';
 
 // Team password lives here in the code (Nate's call). An RD_PASSWORD env var in Vercel, if ever set, overrides it.
 const TEAM_PASSWORD = 'Payments123$';
 
-const seedBoard = () => ({ products: Object.fromEntries(SEED_PRODUCTS.map(({ id, ...p }) => [id, p])), notes: {} });
+// Starter data already includes every update, so a fresh board marks them all as applied.
+const seedBoard = () => ({ products: Object.fromEntries(SEED_PRODUCTS.map(({ id, ...p }) => [id, p])), notes: {}, applied: UPDATES.map(u => u.id) });
 const CONFLICT = Symbol('conflict');
 
 /* ---------- Neon ---------- */
@@ -59,7 +60,14 @@ const store = () => (dbUrl() ? neonStore : blobStore);
 
 export async function loadBoard() {
   const r = await store().read('board');
-  return r ? { board: r.body, tag: r.tag } : { board: seedBoard(), tag: null }; // nothing saved yet: starter products
+  if (!r) return { board: seedBoard(), tag: null }; // nothing saved yet: starter products
+  const pending = UPDATES.filter(u => !(r.body.applied || []).includes(u.id));
+  if (!pending.length) return { board: r.body, tag: r.tag };
+  const board = r.body;
+  for (const u of pending) u.apply(board);
+  board.applied = [...(board.applied || []), ...pending.map(u => u.id)];
+  try { await store().writeIf('board', board, r.tag); } catch (e) { if (e !== CONFLICT) throw e; return loadBoard(); }
+  return loadBoard();
 }
 
 // Read, change, write back only if nobody else saved in between; retry a few times if they did.

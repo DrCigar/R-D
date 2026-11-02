@@ -10,13 +10,15 @@ const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null,
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [],
 };
 
 export const SEED_PRODUCTS = [
-  { id: 'pax-a6650', name: 'PAX A6650 Tablet', category: 'POS tablets', vendor: 'POSPortal', cost: 711,
+  { id: 'pax-a6650', name: 'PAX A6650 Tablet', category: 'POS tablets', vendor: 'POS Portal', cost: 711,
+    quotes: [{ vendor: 'TRG', price: 680 }, { vendor: 'DCC', price: 709 }, { vendor: 'POS Portal', price: 711 }],
     leadTime: '2 weeks', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-08-29', phases: ALL_PASS },
-  { id: 'pax-a6630', name: 'PAX A6630 Tablet', category: 'POS tablets', vendor: 'POSPortal', cost: 450,
+  { id: 'pax-a6630', name: 'PAX A6630 Tablet', category: 'POS tablets', vendor: 'POS Portal', cost: 360,
+    quotes: [{ vendor: 'POS Portal', price: 360 }],
     demoStatus: 'inhouse' },
   { id: 'hanasis-floor', name: 'Amaze Hanasis Kiosk – Floor Standing', category: 'Kiosks', vendor: 'MS-Cash Drawer',
     cost: 1700, leadTime: '1 week', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-10-15', phases: ALL_PASS },
@@ -61,3 +63,13 @@ export const SEED_PRODUCTS = [
       'Faster assembly: lower box no longer has to be centered before the foam slides on',
       'Branded lower box, no tape needed', 'Cleaner, more tailored top foam'] },
 ].map((p, i) => ({ ...base, photoUrl: PHOTOS.has(p.id) ? 'img/' + p.id + '.png' : PHOTOS.has(p.id + '.svg') ? 'img/' + p.id + '.svg' : '', ...p, order: i, createdAt: Date.parse('2026-10-29T12:00:00Z'), createdBy: 'Starter data' }));
+
+// One-time updates for boards that were already saved before a change to the starter data.
+// Each runs once per board (its id is recorded in board.applied) and only touches the fields it names.
+export const UPDATES = [
+  { id: '2026-11-02-vendor-quotes', apply(board) {
+    const set = (id, part) => { if (board.products[id]) Object.assign(board.products[id], part); };
+    set('pax-a6650', { vendor: 'POS Portal', quotes: [{ vendor: 'TRG', price: 680 }, { vendor: 'DCC', price: 709 }, { vendor: 'POS Portal', price: 711 }] });
+    set('pax-a6630', { vendor: 'POS Portal', cost: 360, quotes: [{ vendor: 'POS Portal', price: 360 }] });
+  } },
+];

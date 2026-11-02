@@ -76,6 +76,15 @@ img{max-width:100%}
 .facts .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600}
 .facts .v{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .facts .v.na{color:var(--faint);font-weight:500}
+.quotes{border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px}
+.quotes .qh{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:600;margin-bottom:2px}
+.quotes .q{display:grid;grid-template-columns:1fr auto 64px;gap:8px;align-items:center;padding:3px 0;border-top:1px solid var(--gray)}
+.quotes .qh + .q{border-top:0}
+.quotes .q b{font-weight:600}.quotes .q i{font-style:normal;font-size:11px;color:var(--faint);text-align:right}
+.quotes .q.best b{color:var(--s-approved)}.quotes .q.best i{color:var(--s-approved);font-weight:700}
+.qedit{display:grid;grid-template-columns:1fr 130px 34px;gap:8px;margin-bottom:8px}
+.qedit input{border:1px solid var(--line);border-radius:9px;padding:8px 10px;outline:none;width:100%}
+.qedit button{border:0;background:var(--gray);border-radius:8px;font-size:16px}
 .demo{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted)}
 .demo i{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}
 .demo.in i{background:var(--s-approved)}.demo.req i{background:var(--s-testing)}
@@ -279,6 +288,8 @@ function statusOf(p) {
   if (p.availability === 'future' || p.availability === 'unknown') return 'prelaunch';
   return 'awaiting';
 }
+const quotesOf = p => (p.quotes || []).filter(q => q.vendor || q.price != null).slice().sort((a, b) => (a.price ?? 9e15) - (b.price ?? 9e15));
+const bestCost = p => { const q = quotesOf(p).find(q => q.price != null); return q ? q.price : p.cost; };
 const passed = p => PHASES.filter(ph => p.phases?.[ph.k]?.s === 'pass').length;
 
 /* ---------- storage: rest (Vercel + Neon) or local preview ---------- */
@@ -398,7 +409,7 @@ function match(p) {
   if (filter && statusOf(p) !== filter) return false;
   const q = $('#q').value.trim().toLowerCase(); if (!q) return true;
   const notes = S.notes.filter(n => n.product === p.id).map(n => n.text).join(' ');
-  return [p.name, p.vendor, p.category, p.costNote, p.launch, (p.pros || []).join(' '), (p.cons || []).join(' '), notes].join(' ').toLowerCase().includes(q);
+  return [p.name, p.vendor, (p.quotes || []).map(q => q.vendor).join(' '), p.category, p.costNote, p.launch, (p.pros || []).join(' '), (p.cons || []).join(' '), notes].join(' ').toLowerCase().includes(q);
 }
 function cats() {
   const all = [...new Set(S.products.map(p => p.category || 'Uncategorized'))];
@@ -454,10 +465,17 @@ function card(p) {
   return '<button class="card" data-open="' + esc(p.id) + '">' +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(st, true)) + '">' + icon(p.category) + pill(st, true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + (p.vendor ? esc(p.vendor) : 'Vendor not set') + '</div></div>' +
-    '<div class="facts">' + fact('Cost', money(p.cost) + (p.cost != null && p.costNote ? '*' : '')) + fact('Lead time', p.leadTime) + fact('MOQ', p.moq) + '</div>' +
+    '<div class="facts">' + fact(quotesOf(p).length > 1 ? 'Best' : 'Cost', money(bestCost(p)) + (bestCost(p) != null && p.costNote ? '*' : '')) + fact('Lead time', p.leadTime) + fact('MOQ', p.moq) + '</div>' +
+    quoteList(p) +
     '<div class="demo ' + demoCls + '"><i></i>' + demoTxt + '</div>' +
     '<div class="prog"><div class="segs">' + PHASES.map(ph => '<span class="' + (p.phases?.[ph.k]?.s || 'todo') + '" title="' + esc(ph.t) + '"></span>').join('') + '</div><div class="pl">' + progLbl + '</div></div>' +
     '</div></button>';
+}
+// Vendor price list on the card: only when there's more than one quote to compare
+function quoteList(p) {
+  const qs = quotesOf(p); if (qs.length < 2) return '';
+  const low = qs[0].price;
+  return '<div class="quotes"><div class="qh">Vendor prices</div>' + qs.map(q => '<div class="q' + (q.price != null && q.price === low ? ' best' : '') + '"><span>' + esc(q.vendor || '—') + '</span><b>' + (q.price != null ? money(q.price) : '—') + '</b>' + (q.price != null && q.price === low ? '<i>Lowest</i>' : '<i>' + (q.price != null && low != null ? '+' + money(q.price - low) : '') + '</i>') + '</div>').join('') + '</div>';
 }
 const nextPhase = p => PHASES.find(ph => p.phases?.[ph.k]?.s !== 'pass');
 
@@ -497,6 +515,7 @@ function renderDrawer() {
         '<label class="btn ghost sm">' + (p.doc ? 'Replace' : 'Attach file') + '<input type="file" id="docFile" hidden accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.csv,.txt"></label>' +
       '</div></div>' +
     '</div></div>' +
+    '<div class="sec"><h4>Vendor prices</h4><div id="qrows">' + (p.quotes || []).map((q, i) => '<div class="qedit" data-qi="' + i + '"><input data-qf="vendor" placeholder="Vendor" value="' + esc(q.vendor) + '"><div class="money"><span>$</span><input data-qf="price" type="number" min="0" step="0.01" placeholder="Price" value="' + (q.price ?? '') + '"></div><button data-qdel="' + i + '" aria-label="Remove">×</button></div>').join('') + '</div><button class="btn ghost sm" id="qadd">+ Add vendor price</button></div>' +
     '<div class="sec"><h4>Demo unit</h4><div class="fields">' + sel('demoStatus', 'Status', DEMO) +
       fld('demoDate', 'Date received', 'type="date"') + fld('demoQty', 'Units in house', 'placeholder="e.g. 2"') + '</div></div>' +
     '<div class="sec"><h4>Pros and cons</h4><div class="fields">' +
@@ -536,6 +555,11 @@ async function patch(p, part, rerender = true) {
 function wireDrawer(p) {
   const host = $('#drawerHost');
   host.querySelectorAll('[data-close]').forEach(b => b.onclick = closeDrawer);
+  // vendor prices: edit in place, saved as the whole list
+  const readQuotes = () => [...host.querySelectorAll('.qedit')].map(r => { const v = r.querySelector('[data-qf=vendor]').value.trim(), pr = r.querySelector('[data-qf=price]').value; return { vendor: v, price: pr === '' ? null : Number(pr) }; });
+  host.querySelectorAll('.qedit input').forEach(inp => inp.addEventListener('change', () => patch(p, { quotes: readQuotes() }, false)));
+  host.querySelectorAll('[data-qdel]').forEach(b => b.onclick = () => { const qs = readQuotes(); qs.splice(+b.dataset.qdel, 1); patch(p, { quotes: qs }); });
+  $('#qadd').onclick = () => { patch(p, { quotes: [...readQuotes(), { vendor: '', price: null }] }); setTimeout(() => { const rows = host.querySelectorAll('.qedit'); rows[rows.length - 1]?.querySelector('input')?.focus(); }, 30); };
   host.querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('change', () => {
     const k = inp.dataset.k; let v = inp.value;
     if (k === 'cost') v = v === '' ? null : Number(v);
