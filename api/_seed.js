@@ -10,7 +10,7 @@ const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false,
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false, gallery: [],
 };
 
 export const SEED_PRODUCTS = [
@@ -124,6 +124,14 @@ export const UPDATES = [
       lead(p, '4–12 weeks');
       Object.assign(p, { availability: 'future', launch: 'Available in January (TRG)' });
     }
+  } },
+  { id: '2026-11-03-packaging-photos-price', apply(board) {
+    const p = board.products['pkg-360pro-brown']; if (!p) return;
+    const caps = ['Lower box with corner foam blocks', 'Foam insert slides over the lower box', '360 Pro seated in the insert',
+      'POS360-branded top foam', 'Packed carton'];
+    p.gallery = caps.map((caption, i) => ({ src: `img/pkg-360pro-brown-${i + 1}.jpg`, caption }));
+    p.cost = 52; p.costNote = 'Per set, includes 2 boxes';
+    quote(p, 'Brown Packaging', 52, 'Per set, includes 2 boxes');
   } },
 ];
 
