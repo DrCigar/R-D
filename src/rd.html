@@ -233,8 +233,8 @@ img{max-width:100%}
 .lab-card .price{font-size:15px}
 .next{font-size:12.5px;line-height:1.35;color:var(--ink);background:#F6F6F4;border-radius:8px;padding:6px 9px}
 .next::before{content:"→ ";color:var(--verm);font-weight:800}
-.signs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sign{display:flex;align-items:center;justify-content:center;gap:6px;border:1.5px dashed #c9c9c4;background:#fff;border-radius:10px;padding:7px 6px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
+.signs{display:flex;flex-wrap:wrap;gap:6px}
+.sign{flex:1 1 0;min-width:max-content;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px dashed #c9c9c4;background:#fff;border-radius:10px;padding:7px 6px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
 .sign .ck{width:18px;height:18px;border-radius:50%;border:2px solid #c9c9c4;display:grid;place-items:center;color:transparent;flex:none}
 .sign .ck svg{width:12px;height:12px}
 .sign:hover{border-color:var(--ink);color:var(--ink)}
@@ -255,7 +255,7 @@ img{max-width:100%}
 .approve-stamp{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(255,255,255,.6);pointer-events:none}
 .approve-stamp span{border:4px solid var(--s-approved);color:var(--s-approved);background:#fff;font-weight:900;font-size:26px;letter-spacing:.14em;padding:6px 16px;border-radius:10px;animation:stamp .5s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes stamp{from{transform:rotate(-12deg) scale(2.6);opacity:0}to{transform:rotate(-12deg) scale(1);opacity:1}}
-.dsign .signs{max-width:380px}.dsign .sign{padding:11px 8px;font-size:14px}
+.dsign .signs{max-width:460px}.dsign .sign{padding:11px 8px;font-size:14px}
 .dsign .who-signed{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.6}
 .outcomes{font-size:12.5px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .outcomes button{background:none;border:0;padding:0;color:var(--muted);text-decoration:underline;font-size:12.5px}
@@ -342,7 +342,10 @@ const STATUS = {
 const ORDER = ['soon', 'testing', 'signoff', 'approved', 'hold', 'rejected'];
 const LAB = ['soon', 'testing', 'signoff'];
 const RECENT_DAYS = 90; // approvals stay in "Just approved" this long
-const TEAMS = { ops: 'SC Ops', sys: 'Systems' };
+const TEAMS = { ops: 'SC Ops', sys: 'Systems', exec: 'C-Suite' };
+const TEAM_KEYS = Object.keys(TEAMS);
+const missing = p => TEAM_KEYS.filter(t => !(p.signoffs || {})[t]);
+const listJoin = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const CAT_ORDER = ['Cash registers', 'Computers', 'Keyboards', 'POS tablets', 'Kiosks', 'Pin pads and terminals', 'Printers', 'Foam and packaging', 'Networking and connectivity'];
 const DEMO = { '': 'Not recorded', none: 'No demo unit yet', requested: 'Demo requested', inhouse: 'Demo in house', returned: 'Demo returned' };
 const AVAIL = { now: 'Available now', soon: 'Available soon', future: 'Launch date set', unknown: 'Launch date unknown' };
@@ -364,13 +367,13 @@ function ago(s) {
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.h); toast.h = setTimeout(() => t.hidden = true, 2600); }
 
 /* ---------- status ---------- */
-// Approved = both teams signed off (or approved before sign-offs existed). One signature = waiting on the other.
+// Approved = all three sign-offs (or approved before sign-offs existed). Some but not all = waiting on the rest.
 function statusOf(p) {
   if (p.decision === 'rejected') return 'rejected';
   if (p.decision === 'hold') return 'hold';
   const so = p.signoffs || {};
-  if (p.decision === 'approved' || (so.ops && so.sys)) return 'approved';
-  if (so.ops || so.sys) return 'signoff';
+  if (p.decision === 'approved' || !missing(p).length) return 'approved';
+  if (TEAM_KEYS.some(t => so[t])) return 'signoff';
   const started = PHASES.some(ph => (p.phases?.[ph.k]?.s || 'todo') !== 'todo');
   if (p.demoStatus === 'inhouse' || p.demoStatus === 'returned' || started) return 'testing';
   return 'soon';
@@ -379,8 +382,8 @@ const daysSince = d => (Date.now() - new Date(d + 'T12:00:00')) / 864e5;
 const isRecent = p => !p.decisionDate || daysSince(p.decisionDate) <= RECENT_DAYS; // no date yet counts as recent
 function nextStep(p) {
   const st = statusOf(p), so = p.signoffs || {};
-  if (st === 'signoff') return 'Waiting on ' + (so.ops ? 'Systems' : 'SC Ops') + ' sign-off';
-  if (st === 'testing') return 'Ready for SC Ops and Systems sign-off';
+  if (st === 'signoff') return 'Waiting on ' + listJoin(missing(p).map(t => TEAMS[t])) + ' sign-off';
+  if (st === 'testing') return 'Ready for SC Ops, Systems and C-Suite sign-off';
   if (st === 'hold') return 'On hold';
   if (st === 'rejected') return 'Not approved';
   if (p.availability === 'future' || p.availability === 'unknown') return p.launch || 'Waiting on launch';
@@ -650,7 +653,7 @@ function renderDrawer() {
       ((p.photo || p.photoUrl) ? '<button class="btn danger sm" id="photoDel">Remove photo</button>' : '') + '</div></div></div>' +
     '<div class="sec dsign"><h4>Sign-offs</h4><div class="decision">' + signBtns(p) +
       '<div class="who-signed">' + Object.entries(TEAMS).map(([t, l]) => { const s = (p.signoffs || {})[t]; return l + ': ' + (s ? esc(s.by) + (s.date ? ' · ' + fmtDate(s.date) : '') : 'not yet'); }).join('<br>') + '</div>' +
-      '<div style="font-size:12.5px;color:var(--muted)">' + (st === 'approved' ? 'Approved' + (p.decisionDate ? ' ' + fmtDate(p.decisionDate) : '') + '.' : 'Approves automatically once both teams sign off.') + '</div>' +
+      '<div style="font-size:12.5px;color:var(--muted)">' + (st === 'approved' ? 'Approved' + (p.decisionDate ? ' ' + fmtDate(p.decisionDate) : '') + '.' : 'Approves automatically once SC Ops, Systems and C-Suite all sign off.') + '</div>' +
       (st === 'approved' ? '<div class="f" style="max-width:200px"><label for="f-decisionDate">Approval date</label><input id="f-decisionDate" data-k="decisionDate" type="date" value="' + esc(p.decisionDate) + '"></div>' : '') +
       '<div class="outcomes">' + (['hold', 'rejected'].includes(st) ? 'Marked ' + STATUS[st].l.toLowerCase() + '. <button data-dec="pending">Back to testing</button>'
         : 'Other outcomes: <button data-dec="hold">Put on hold</button><button data-dec="rejected">Not approved</button>') + '</div>' +
@@ -833,7 +836,7 @@ function toggleDefault(id) {
   const p = S.products.find(x => x.id === id); if (!p) return;
   patch(p, { isDefault: !p.isDefault }, !!openId);
 }
-// Sign-offs: two teams; the second one approves the product (with a stamp) and moves it to "Just approved".
+// Sign-offs: SC Ops, Systems and C-Suite; the last one approves the product (with a stamp) and moves it to "Just approved".
 async function signOff(id, team) {
   const p = S.products.find(x => x.id === id); if (!p) return;
   const so = { ...(p.signoffs || {}) };
@@ -844,8 +847,8 @@ async function signOff(id, team) {
   }
   so[team] = { by: me(), date: today() };
   const part = { signoffs: so };
-  if (so.ops && so.sys) {
-    Object.assign(part, { decision: 'approved', decisionDate: today(), decisionBy: 'SC Ops: ' + so.ops.by + ' · Systems: ' + so.sys.by });
+  if (TEAM_KEYS.every(t => so[t])) {
+    Object.assign(part, { decision: 'approved', decisionDate: today(), decisionBy: TEAM_KEYS.map(t => TEAMS[t] + ': ' + so[t].by).join(' · ') });
     document.querySelectorAll('.card[data-open="' + CSS.escape(id) + '"]').forEach(c => c.insertAdjacentHTML('beforeend', '<div class="approve-stamp"><span>APPROVED</span></div>'));
     await new Promise(r => setTimeout(r, 1100));
     toast(p.name + ' approved');

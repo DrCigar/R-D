@@ -176,6 +176,13 @@ export const UPDATES = [
       p.signoffs = { ops: p.signoffs?.ops || done, sys: p.signoffs?.sys || done };
     }
   } },
+  { id: '2026-11-10-csuite-signoff', apply(board) {
+    // C-Suite became the third sign-off; earlier approvals count as signed by it too
+    for (const p of Object.values(board.products)) {
+      if (p.decision !== 'approved' || p.signoffs?.exec) continue;
+      p.signoffs = { ...(p.signoffs || {}), exec: { by: 'Approved before sign-offs', date: p.decisionDate || '' } };
+    }
+  } },
 ];
 
 export function startingBoard() {

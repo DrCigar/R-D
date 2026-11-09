@@ -7,10 +7,10 @@ A shared board for Supply Chain Ops and Systems to track new hardware from first
 The Overview (default view) has three parts:
 
 - **Just approved:** approvals from the last 90 days, newest first. Older ones move to Approval history automatically.
-- **In the lab:** everything still being worked on, in three lanes: Coming soon (pre-launch or no demo unit yet), Testing (demo in hand), and Waiting on sign-off (one team signed, the other hasn't). Each card shows its next step.
+- **In the lab:** everything still being worked on, in three lanes: Coming soon (pre-launch or no demo unit yet), Testing (demo in hand), and Waiting on sign-off (some but not all of SC Ops, Systems and C-Suite have signed). Each card shows its next step.
 - **Approval history** (collapsed): older approvals plus anything on hold or not approved.
 
-**Approvals are two sign-offs.** Each lab card has SC Ops and Systems buttons. When both teams have signed, the product is approved automatically with today's date and moves to Just approved. Products approved before sign-offs existed count as signed by both. Hold and Not approved are in the product panel under Sign-offs. The five-step testing checklist is still in the panel, but it's optional and doesn't decide the status.
+**Approvals are three sign-offs.** Each lab card has SC Ops, Systems and C-Suite buttons. When all three have signed, the product is approved automatically with today's date and moves to Just approved. Products approved before sign-offs existed count as signed by all three. Hold and Not approved are in the product panel under Sign-offs. The five-step testing checklist is still in the panel, but it's optional and doesn't decide the status.
 
 **By category** is the second view: every product grouped by category.
 
