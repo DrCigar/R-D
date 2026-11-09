@@ -282,7 +282,7 @@ const STATUS = {
   rejected: { l: 'Not approved', c: 'var(--s-rejected)' },
 };
 const ORDER = ['prelaunch', 'awaiting', 'testing', 'approved', 'hold', 'rejected'];
-const CAT_ORDER = ['Cash registers', 'Keyboards', 'POS tablets', 'Kiosks', 'Pin pads and terminals', 'Printers', 'Foam and packaging', 'Networking and connectivity'];
+const CAT_ORDER = ['Cash registers', 'Computers', 'Keyboards', 'POS tablets', 'Kiosks', 'Pin pads and terminals', 'Printers', 'Foam and packaging', 'Networking and connectivity'];
 const DEMO = { '': 'Not recorded', none: 'No demo unit yet', requested: 'Demo requested', inhouse: 'Demo in house', returned: 'Demo returned' };
 const AVAIL = { now: 'Available now', soon: 'Available soon', future: 'Launch date set', unknown: 'Launch date unknown' };
 const AUTH_KEY = 'pos360-rd-auth', PREVIEW_KEY = 'pos360-rd-preview-v1', VIEW_KEY = 'pos360-rd-view', DOCS_KEY = 'pos360-rd-preview-docs';
@@ -452,6 +452,7 @@ function icon(cat, size = 54) {
   if (c.includes('kiosk')) return '<svg ' + s + '><rect x="14" y="4" width="20" height="28" rx="2"/><path d="M18 8h12v16H18zM24 32v8M16 44h16"/></svg>';
   if (c.includes('payment') || c.includes('pin')) return '<svg ' + s + '><rect x="13" y="4" width="22" height="40" rx="3"/><rect x="17" y="9" width="14" height="10" rx="1"/><path d="M18 25h2M23 25h2M28 25h2M18 30h2M23 30h2M28 30h2M18 35h2M23 35h2M28 35h2"/></svg>';
   if (c.includes('network') || c.includes('router') || c.includes('connect')) return '<svg ' + s + '><rect x="6" y="26" width="36" height="12" rx="3"/><path d="M14 26 10 12M34 26l4-14M13 32h2M19 32h2"/><path d="M19 15a7 7 0 0 1 10 0M16 11a12 12 0 0 1 16 0"/></svg>';
+  if (c.includes('computer')) return '<svg ' + s + '><rect x="5" y="8" width="38" height="24" rx="2"/><path d="M9 12h30v16H9zM20 32l-2 8h12l-2-8M15 40h18"/></svg>';
   if (c.includes('keyboard')) return '<svg ' + s + '><rect x="4" y="14" width="40" height="22" rx="3"/><path d="M10 20h2M16 20h2M22 20h2M28 20h2M34 20h4M10 25h4M18 25h2M24 25h2M30 25h2M36 25h2M14 30h20"/></svg>';
   if (c.includes('register')) return '<svg ' + s + '><rect x="6" y="30" width="36" height="12" rx="2"/><path d="M18 36h12M12 30l2-8h20l2 8M20 22l-2-14h18l-4 14"/></svg>';
   if (c.includes('packag') || c.includes('foam')) return '<svg ' + s + '><path d="M24 5 42 14v20L24 43 6 34V14z"/><path d="M6 14l18 9 18-9M24 23v20M15 9.5l18 9"/></svg>';

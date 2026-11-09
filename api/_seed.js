@@ -18,6 +18,13 @@ export const SEED_PRODUCTS = [
     photoUrl: 'img/360-smoke.jpg', decision: 'approved', decisionDate: '2026-09-15', phases: ALL_PASS, launch: 'Live since Sept 15, 2026' },
   { id: 'prehkeytec-mci60', name: 'PrehKeyTec MCI 60 – Custom Smoke Shop Keyboard', category: 'Keyboards', vendor: 'PrehKeyTec',
     cost: 98.5, quotes: [{ vendor: 'PrehKeyTec', price: 98.5 }], decision: 'approved', decisionDate: '2026-09-15', phases: ALL_PASS },
+  { id: 'matsuda-st8500f', name: 'Matsuda ST8500F 15.6" Touch Computer', category: 'Computers', vendor: 'Matsuda',
+    cost: 633, quotes: [{ vendor: 'Matsuda', price: 633, note: 'MOQ 200 · 10–15 weeks lead time' }], leadTime: '10–15 weeks', moq: '200',
+    decision: 'approved', phases: ALL_PASS, isDefault: true,
+    gallery: [{ src: 'img/matsuda-st8500f-1.png', caption: 'Front' }, { src: 'img/matsuda-st8500f-2.png', caption: 'Back, VESA mount' }],
+    pros: ['15.6" true flat capacitive touch, 1920 × 1080', 'Intel i3 13th gen 1315U, fanless', '16 GB RAM', 'M.2 2280 256 GB NVMe, easy to swap',
+      'Built-in Wi-Fi and speaker', 'Windows 10 Pro installed and activated', 'I/O: 4 × USB + HDMI', 'Metal frame, VESA mount', '12V 7A power supply'],
+    cons: ['No base or stand included', 'No customer display'] },
   { id: 'pax-a6650', name: 'PAX A6650 Tablet', category: 'POS tablets', vendor: 'POS Portal', cost: 711,
     quotes: [{ vendor: 'TRG', price: 680 }, { vendor: 'DCC', price: 709 }, { vendor: 'POS Portal', price: 711 }],
     leadTime: '2 weeks', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-08-29', phases: ALL_PASS },
@@ -147,6 +154,11 @@ export const UPDATES = [
   { id: '2026-11-09-mci60-photo', apply(board) {
     const p = board.products['prehkeytec-mci60'];
     if (p && !p.photo && !p.photoUrl) p.photoUrl = 'img/prehkeytec-mci60.jpg'; // keeps a photo someone already uploaded
+  } },
+  { id: '2026-11-09-matsuda-st8500f', apply(board) {
+    if (board.products['matsuda-st8500f']) return;
+    const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'matsuda-st8500f');
+    board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
   } },
 ];
 
