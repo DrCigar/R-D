@@ -14,6 +14,10 @@ const base = {
 };
 
 export const SEED_PRODUCTS = [
+  { id: '360-smoke', name: '360 Smoke', category: 'Cash registers', vendor: 'Assembly item (no vendor)',
+    photoUrl: 'img/360-smoke.jpg', decision: 'approved', decisionDate: '2026-09-15', phases: ALL_PASS, launch: 'Live since Sept 15, 2026' },
+  { id: 'prehkeytec-mci60', name: 'PrehKeyTec MCI 60 – Custom Smoke Shop Keyboard', category: 'Keyboards', vendor: 'PrehKeyTec',
+    cost: 98.5, quotes: [{ vendor: 'PrehKeyTec', price: 98.5 }], decision: 'approved', decisionDate: '2026-09-15', phases: ALL_PASS },
   { id: 'pax-a6650', name: 'PAX A6650 Tablet', category: 'POS tablets', vendor: 'POS Portal', cost: 711,
     quotes: [{ vendor: 'TRG', price: 680 }, { vendor: 'DCC', price: 709 }, { vendor: 'POS Portal', price: 711 }],
     leadTime: '2 weeks', demoStatus: 'inhouse', decision: 'approved', decisionDate: '2026-08-29', phases: ALL_PASS },
@@ -132,6 +136,13 @@ export const UPDATES = [
     p.gallery = caps.map((caption, i) => ({ src: `img/pkg-360pro-brown-${i + 1}.jpg`, caption }));
     p.cost = 52; p.costNote = 'Per set, includes 2 boxes';
     quote(p, 'Brown Packaging', 52, 'Per set, includes 2 boxes');
+  } },
+  { id: '2026-11-09-360-smoke', apply(board) {
+    for (const add of ['360-smoke', 'prehkeytec-mci60']) {
+      if (board.products[add]) continue;
+      const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === add);
+      board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
+    }
   } },
 ];
 
