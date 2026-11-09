@@ -10,7 +10,7 @@ const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false, gallery: [],
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false, gallery: [], signoffs: {},
 };
 
 export const SEED_PRODUCTS = [
@@ -168,6 +168,13 @@ export const UPDATES = [
   { id: '2026-11-10-pax-kiosk-photo', apply(board) {
     const p = board.products['pax-kiosk'];
     if (p && !p.photo && !p.photoUrl) p.photoUrl = 'img/pax-kiosk.jpg'; // keeps a photo someone already uploaded
+  } },
+  { id: '2026-11-10-signoffs', apply(board) {
+    for (const p of Object.values(board.products)) {
+      if (p.decision !== 'approved' || (p.signoffs?.ops && p.signoffs?.sys)) continue;
+      const done = { by: 'Approved before sign-offs', date: p.decisionDate || '' };
+      p.signoffs = { ops: p.signoffs?.ops || done, sys: p.signoffs?.sys || done };
+    }
   } },
 ];
 
