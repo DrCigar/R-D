@@ -21,7 +21,7 @@ export const SEED_PRODUCTS = [
   { id: 'matsuda-st8500f', name: 'Matsuda ST8500F 15.6" Touch Computer', category: 'Computers', vendor: 'Matsuda',
     cost: 633, quotes: [{ vendor: 'Matsuda', price: 633, note: 'MOQ 200 · 10–15 weeks lead time' }], leadTime: '10–15 weeks', moq: '200',
     decision: 'approved', phases: ALL_PASS, isDefault: true,
-    gallery: [{ src: 'img/matsuda-st8500f-1.png', caption: 'Front' }, { src: 'img/matsuda-st8500f-2.png', caption: 'Back, VESA mount' }],
+    photoUrl: 'img/matsuda-st8500f.jpg',
     pros: ['15.6" true flat capacitive touch, 1920 × 1080', 'Intel i3 13th gen 1315U, fanless', '16 GB RAM', 'M.2 2280 256 GB NVMe, easy to swap',
       'Built-in Wi-Fi and speaker', 'Windows 10 Pro installed and activated', 'I/O: 4 × USB + HDMI', 'Metal frame, VESA mount', '12V 7A power supply'],
     cons: ['No base or stand included', 'No customer display'] },
@@ -159,6 +159,11 @@ export const UPDATES = [
     if (board.products['matsuda-st8500f']) return;
     const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'matsuda-st8500f');
     board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
+  } },
+  { id: '2026-11-09-st8500f-photo', apply(board) {
+    const p = board.products['matsuda-st8500f']; if (!p) return;
+    p.gallery = []; // replaced by Nate's product shot
+    if (!p.photo) p.photoUrl = 'img/matsuda-st8500f.jpg';
   } },
 ];
 
