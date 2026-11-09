@@ -144,6 +144,10 @@ export const UPDATES = [
       board.products[id] = { ...doc, createdAt: Date.now(), createdBy: 'Added by update' };
     }
   } },
+  { id: '2026-11-09-mci60-photo', apply(board) {
+    const p = board.products['prehkeytec-mci60'];
+    if (p && !p.photo && !p.photoUrl) p.photoUrl = 'img/prehkeytec-mci60.jpg'; // keeps a photo someone already uploaded
+  } },
 ];
 
 export function startingBoard() {
