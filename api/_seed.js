@@ -165,6 +165,10 @@ export const UPDATES = [
     p.gallery = []; // replaced by Nate's product shot
     if (!p.photo) p.photoUrl = 'img/matsuda-st8500f.jpg';
   } },
+  { id: '2026-11-10-pax-kiosk-photo', apply(board) {
+    const p = board.products['pax-kiosk'];
+    if (p && !p.photo && !p.photoUrl) p.photoUrl = 'img/pax-kiosk.jpg'; // keeps a photo someone already uploaded
+  } },
 ];
 
 export function startingBoard() {
