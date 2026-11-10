@@ -242,8 +242,8 @@ img{max-width:100%}
 .lab-card .cb{gap:8px;padding:12px 14px 14px}
 .lab-card .nm{font-size:14px}
 .lab-card .price{font-size:15px}
-.next{font-size:12.5px;line-height:1.35;color:var(--ink);background:#F6F6F4;border-radius:8px;padding:6px 9px}
-.next::before{content:"→ ";color:var(--verm);font-weight:800}
+.nstep{font-size:12.5px;line-height:1.35;color:var(--ink);background:#F6F6F4;border-radius:8px;padding:6px 9px}
+.nstep::before{content:"→ ";color:var(--verm);font-weight:800}
 .signs{display:flex;flex-wrap:wrap;gap:6px}
 .sign{flex:1 1 0;min-width:max-content;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px dashed #c9c9c4;background:#fff;border-radius:10px;padding:7px 6px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
 .sign .ck{width:18px;height:18px;border-radius:50%;border:2px solid #c9c9c4;display:grid;place-items:center;color:transparent;flex:none}
@@ -252,6 +252,8 @@ img{max-width:100%}
 .sign.on{border:1.5px solid var(--s-approved);background:color-mix(in srgb,var(--s-approved) 9%,#fff);color:var(--s-approved)}
 .sign.on .ck{background:var(--s-approved);border-color:var(--s-approved);color:#fff}
 .hist{background:#fff;border:1px solid var(--line);border-radius:14px;padding:2px 16px}
+.hist-open .hrow:first-child{border-top:0}
+.hist-open{padding:4px 16px}
 .hist summary{cursor:pointer;padding:13px 0;font-weight:700;font-size:15px;list-style:none;display:flex;gap:8px;align-items:center}
 .hist summary::-webkit-details-marker{display:none}
 .hist summary::before{content:"›";font-size:20px;line-height:1;color:var(--muted);transition:transform .15s}
@@ -604,15 +606,16 @@ function card(p) {
     quoteList(p) +
     '<div class="demo ' + demoCls + '"><i></i>' + demoTxt + '</div>' +
     (st === 'approved' ? '<div class="pl2">Approved' + (p.decisionDate ? ' ' + ago(p.decisionDate) + ' · ' + fmtDate(p.decisionDate) : '') + '</div>'
-      : '<div class="next">' + esc(nextStep(p)) + '</div>' + (LAB.includes(st) ? signBtns(p) : '')) +
+      : '<div class="nstep">' + esc(nextStep(p)) + '</div>' + (LAB.includes(st) ? signBtns(p) : '')) +
     '</div></div>';
 }
 function overview(list) {
   const recent = list.filter(p => statusOf(p) === 'approved' && isRecent(p))
     .sort((a, b) => (b.decisionDate || '9999').localeCompare(a.decisionDate || '9999'));
   const lab = list.filter(p => LAB.includes(statusOf(p)));
-  const hist = list.filter(p => (statusOf(p) === 'approved' && !isRecent(p)) || ['hold', 'rejected'].includes(statusOf(p)))
-    .sort((a, b) => (b.decisionDate || '').localeCompare(a.decisionDate || ''));
+  const byDate = (a, b) => (b.decisionDate || '').localeCompare(a.decisionDate || '');
+  const closed = list.filter(p => ['rejected', 'hold'].includes(statusOf(p))).sort(byDate);
+  const hist = list.filter(p => statusOf(p) === 'approved' && !isRecent(p)).sort(byDate);
   const price = p => bestCost(p) != null ? '<span class="price">' + money(bestCost(p)) + '</span>' : '<span></span>';
   const shelfCard = p => '<div class="card shelf-card' + (p.isDefault ? ' def' : '') + '" role="button" tabindex="0" data-open="' + esc(p.id) + '">' + defBox(p) +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill('approved', true)) + '">' + icon(p.category) + pill('approved', true) + '</div>' +
@@ -621,7 +624,7 @@ function overview(list) {
   const labCard = p => '<div class="card lab-card" role="button" tabindex="0" data-open="' + esc(p.id) + '">' +
     '<div class="ph" data-photo="' + esc(p.id) + '">' + icon(p.category) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + esc([p.category, p.vendor].filter(Boolean).join(' · ')) + '</div></div>' +
-    (bestCost(p) != null ? price(p) : '') + '<div class="next">' + esc(nextStep(p)) + '</div>' + signBtns(p) + '</div></div>';
+    (bestCost(p) != null ? price(p) : '') + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + signBtns(p) + '</div></div>';
   const lanes = LAB.map(st => { const items = lab.filter(p => statusOf(p) === st);
     return '<div class="lane"><div class="lane-h">' + pill(st) + '<b>' + items.length + '</b></div>' + (items.map(labCard).join('') || '<div class="lane-empty">Nothing here</div>') + '</div>'; }).join('');
   const row = p => '<div class="hrow" role="button" tabindex="0" data-open="' + esc(p.id) + '"><span class="th" data-photo="' + esc(p.id) + '">' + icon(p.category, 22) + '</span>' +
@@ -629,7 +632,9 @@ function overview(list) {
   return '<section class="ov"><div class="ov-h"><h2>Just approved</h2><span>last ' + RECENT_DAYS + ' days</span></div>' +
       (recent.length ? '<div class="shelf">' + recent.map(shelfCard).join('') + '</div>' : '<div class="lane-empty">No approvals in the last ' + RECENT_DAYS + ' days.</div>') + '</section>' +
     '<section class="ov"><div class="ov-h"><h2>In the lab</h2><span>' + lab.length + ' product' + (lab.length === 1 ? '' : 's') + '</span></div><div class="lanes">' + lanes + '</div></section>' +
-    (hist.length ? '<details class="hist"' + (S.histOpen ? ' open' : '') + '><summary>Approval history <span>' + hist.length + ' older or closed</span></summary>' + hist.map(row).join('') + '</details>' : '');
+    '<section class="ov"><div class="ov-h"><h2>Not approved</h2><span>' + (closed.length ? closed.length + ' product' + (closed.length === 1 ? '' : 's') + ', including anything on hold' : 'including anything on hold') + '</span></div>' +
+      (closed.length ? '<div class="hist hist-open">' + closed.map(row).join('') + '</div>' : '<div class="lane-empty">Nothing rejected or on hold.</div>') + '</section>' +
+    (hist.length ? '<details class="hist"' + (S.histOpen ? ' open' : '') + '><summary>Older approvals <span>' + hist.length + ' approved more than ' + RECENT_DAYS + ' days ago</span></summary>' + hist.map(row).join('') + '</details>' : '');
 }
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 const defBox = p => '<button class="defbox' + (p.isDefault ? ' on' : '') + '" data-def="' + esc(p.id) + '" role="checkbox" aria-checked="' + !!p.isDefault + '" title="' + (p.isDefault ? 'This is the current default. Click to unmark.' : 'Mark as the current default') + '"><span class="ck">' + CHECK + '</span>' + (p.isDefault ? 'Current default' : 'Default') + '</button>';

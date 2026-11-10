@@ -8,7 +8,8 @@ The Overview (default view) has three parts:
 
 - **Just approved:** approvals from the last 90 days, newest first. Older ones move to Approval history automatically.
 - **In the lab:** everything still being worked on, in three lanes: Coming soon (pre-launch or no demo unit yet), Testing (demo in hand), and Waiting on sign-off (some but not all of SC Ops, Systems and C-Suite have signed). Each card shows its next step.
-- **Approval history** (collapsed): older approvals plus anything on hold or not approved.
+- **Not approved:** always visible at the bottom, listing anything marked Not approved or On hold.
+- **Older approvals** (collapsed): approvals from more than 90 days ago.
 
 **Approvals are three sign-offs.** Each lab card has SC Ops, Systems and C-Suite buttons. When all three have signed, the product is approved automatically with today's date and moves to Just approved. Products approved before sign-offs existed count as signed by all three. Hold and Not approved are in the product panel under Sign-offs. The five-step testing checklist is still in the panel, but it's optional and doesn't decide the status.
 
