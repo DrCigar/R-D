@@ -221,14 +221,15 @@ img{max-width:100%}
 .srow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:auto}
 .price{font-weight:800;font-size:18px;letter-spacing:-.01em}
 .when{font-size:12px;color:var(--muted);white-space:nowrap}
-.labgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
-@media (max-width:1100px){.labgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:640px){.labgrid{grid-template-columns:1fr}}
+.lanes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:900px){.lanes{grid-template-columns:1fr}}
 .lane{background:#EFEFEC;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:12px}
 .lane-h{display:flex;justify-content:space-between;align-items:center;padding:2px 2px 0}
 .lane-h b{font-size:12px;color:var(--muted);font-weight:600}
 .lane-empty{font-size:12.5px;color:var(--faint);text-align:center;padding:18px 0}
-.lab-card .ph{aspect-ratio:auto;height:200px;background:#fff;border-bottom:1px solid var(--gray)}
+.lab-card{display:grid;grid-template-columns:190px minmax(0,1fr);align-items:stretch}
+.lab-card .ph{aspect-ratio:auto;height:auto;min-height:190px;background:#fff;border-right:1px solid var(--gray)}
+@media (max-width:640px){.lab-card{grid-template-columns:1fr}.lab-card .ph{min-height:180px;border-right:0;border-bottom:1px solid var(--gray)}}
 .lab-card .ph img{padding:10px}
 .lab-card .cb{gap:8px;padding:12px 14px 14px}
 .lab-card .signs{margin-top:auto}
@@ -617,13 +618,15 @@ function overview(list) {
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(statusOf(p), true)) + '">' + icon(p.category) + pill(statusOf(p), true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + esc([p.category, p.vendor].filter(Boolean).join(' · ')) + '</div></div>' +
     (bestCost(p) != null ? price(p) : '') + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + signBtns(p) + '</div></div>';
-  const labOrder = ['signoff', 'testing', 'soon'];
-  const labSorted = lab.slice().sort((a, b) => labOrder.indexOf(statusOf(a)) - labOrder.indexOf(statusOf(b)));
+  // two lanes: Coming soon, then Testing (anything waiting on sign-offs sits at the top of Testing)
+  const soon = lab.filter(p => statusOf(p) === 'soon');
+  const testing = lab.filter(p => statusOf(p) !== 'soon').sort((a, b) => (statusOf(a) === 'signoff' ? 0 : 1) - (statusOf(b) === 'signoff' ? 0 : 1));
+  const lane = (title, st, items) => '<div class="lane"><div class="lane-h">' + pill(st) + '<b>' + items.length + '</b></div>' + (items.map(labCard).join('') || '<div class="lane-empty">Nothing here</div>') + '</div>';
   const row = p => '<div class="hrow" role="button" tabindex="0" data-open="' + esc(p.id) + '"><span class="th" data-photo="' + esc(p.id) + '">' + icon(p.category, 22) + '</span>' +
     '<span><b>' + esc(p.name) + '</b><small>' + esc(p.category || '') + '</small></span>' + pill(statusOf(p)) + '<span class="hd">' + fmtDate(p.decisionDate) + '</span></div>';
   return '<section class="ov"><div class="ov-h"><h2>Just approved</h2><span>last ' + RECENT_DAYS + ' days</span></div>' +
       (recent.length ? '<div class="shelf">' + recent.map(shelfCard).join('') + '</div>' : '<div class="lane-empty">No approvals in the last ' + RECENT_DAYS + ' days.</div>') + '</section>' +
-    '<section class="ov"><div class="ov-h"><h2>In the lab</h2><span>' + lab.length + ' product' + (lab.length === 1 ? '' : 's') + '</span></div>' + (labSorted.length ? '<div class="labgrid">' + labSorted.map(labCard).join('') + '</div>' : '<div class="lane-empty">Nothing in the lab right now.</div>') + '</section>' +
+    '<section class="ov"><div class="ov-h"><h2>In the lab</h2><span>' + lab.length + ' product' + (lab.length === 1 ? '' : 's') + '</span></div><div class="lanes">' + lane('Coming soon', 'soon', soon) + lane('Testing', 'testing', testing) + '</div></section>' +
     '<section class="ov"><div class="ov-h"><h2>Not approved</h2><span>' + (closed.length ? closed.length + ' product' + (closed.length === 1 ? '' : 's') + ', including anything on hold' : 'including anything on hold') + '</span></div>' +
       (closed.length ? '<div class="hist hist-open">' + closed.map(row).join('') + '</div>' : '<div class="lane-empty">Nothing rejected or on hold.</div>') + '</section>' +
     (hist.length ? '<details class="hist"' + (S.histOpen ? ' open' : '') + '><summary>Older approvals <span>' + hist.length + ' approved more than ' + RECENT_DAYS + ' days ago</span></summary>' + hist.map(row).join('') + '</details>' : '');
