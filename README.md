@@ -7,7 +7,8 @@ A shared board for Supply Chain Ops and Systems to track new hardware from first
 The Overview (default view) has three parts:
 
 - **Just approved:** approvals from the last 90 days, newest first. Older ones move to Approval history automatically.
-- **In the lab:** everything still being worked on, in two lanes: **Coming soon** (pre-launch or no demo unit yet) and **Testing** (demo in hand). Anything waiting on sign-offs sits at the top of Testing with a Waiting on sign-off tag. Each card shows its next step, a **Demo unit in house** checkbox (ticking it moves the product from Coming soon to Testing and records today as the date received), and the sign-off buttons.
+- **In the lab:** everything still being worked on, in two lanes: **Coming soon** (pre-launch or no demo unit yet) and **Testing** (demo in hand). Anything waiting on sign-offs sits at the top of Testing with a Waiting on sign-off tag. Each card shows its next step, a **Demo unit in house** checkbox (ticking it moves the product from Coming soon to Testing and records today as the date received), and the sign-off buttons. The newest note on each product shows on its card (who posted it, when, and the first two lines).
+- **Latest notes:** the 8 newest notes across all products, showing the product name, who posted, and when. Click a row to open that product.
 - **Not approved:** always visible at the bottom, listing anything marked Not approved or On hold.
 - **Older approvals** (collapsed): approvals from more than 90 days ago.
 
