@@ -238,6 +238,13 @@ img{max-width:100%}
 .nstep{font-size:12.5px;line-height:1.35;color:var(--ink);background:#F6F6F4;border-radius:8px;padding:6px 9px}
 .nstep::before{content:"→ ";color:var(--verm);font-weight:800}
 .signs{display:flex;flex-wrap:wrap;gap:6px}
+.demobox{display:flex;align-items:center;gap:8px;background:none;border:0;padding:2px 0;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;text-align:left;align-self:flex-start}
+.demobox:hover{color:var(--ink)}
+.demobox .ck{width:20px;height:20px;border:2px solid #b8b8b4;border-radius:6px;display:grid;place-items:center;color:transparent;background:#fff;flex:none}
+.demobox .ck svg{width:14px;height:14px}
+.demobox.on{color:var(--s-approved)}
+.demobox.on .ck{background:var(--s-approved);border-color:var(--s-approved);color:#fff}
+.demobox small{font-weight:500;color:var(--muted);margin-left:2px}
 .sign{flex:1 1 0;min-width:max-content;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:5px;border:1.5px dashed #c9c9c4;background:#fff;border-radius:10px;padding:7px 6px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer}
 .sign .ck{width:18px;height:18px;border-radius:50%;border:2px solid #c9c9c4;display:grid;place-items:center;color:transparent;flex:none}
 .sign .ck svg{width:12px;height:12px}
@@ -617,7 +624,7 @@ function overview(list) {
   const labCard = p => '<div class="card lab-card" role="button" tabindex="0" data-open="' + esc(p.id) + '">' +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(statusOf(p), true)) + '">' + icon(p.category) + pill(statusOf(p), true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + esc([p.category, p.vendor].filter(Boolean).join(' · ')) + '</div></div>' +
-    (bestCost(p) != null ? price(p) : '') + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + signBtns(p) + '</div></div>';
+    (bestCost(p) != null ? price(p) : '') + demoBox(p) + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + signBtns(p) + '</div></div>';
   // two lanes: Coming soon, then Testing (anything waiting on sign-offs sits at the top of Testing)
   const soon = lab.filter(p => statusOf(p) === 'soon');
   const testing = lab.filter(p => statusOf(p) !== 'soon').sort((a, b) => (statusOf(a) === 'signoff' ? 0 : 1) - (statusOf(b) === 'signoff' ? 0 : 1));
@@ -867,6 +874,14 @@ async function signOff(id, team) {
   patch(p, part, !!openId);
 }
 document.addEventListener('click', e => { const s = e.target.closest('[data-sign]'); if (!s) return; e.stopPropagation(); signOff(s.dataset.pid, s.dataset.sign); }, true);
+// Demo unit checkbox on lab cards: ticking it moves the product from Coming soon to Testing
+const demoBox = p => { const on = p.demoStatus === 'inhouse';
+  return '<button class="demobox' + (on ? ' on' : '') + '" data-demo="' + esc(p.id) + '" role="checkbox" aria-checked="' + on + '"><span class="ck">' + CHECK + '</span>Demo unit in house' + (on && p.demoDate ? '<small>since ' + fmtDate(p.demoDate) + '</small>' : '') + '</button>'; };
+function toggleDemo(id) {
+  const p = S.products.find(x => x.id === id); if (!p) return;
+  patch(p, p.demoStatus === 'inhouse' ? { demoStatus: 'none', demoDate: '' } : { demoStatus: 'inhouse', demoDate: p.demoDate || today() }, !!openId);
+}
+document.addEventListener('click', e => { const d = e.target.closest('[data-demo]'); if (!d) return; e.stopPropagation(); toggleDemo(d.dataset.demo); }, true);
 document.addEventListener('toggle', e => { if (e.target.matches?.('details.hist')) S.histOpen = e.target.open; }, true);
 $('#view').onclick = e => {
   const d = e.target.closest('[data-def]'); if (d) { e.stopPropagation(); return toggleDefault(d.dataset.def); }
