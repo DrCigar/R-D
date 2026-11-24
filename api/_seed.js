@@ -43,6 +43,7 @@ export const SEED_PRODUCTS = [
   { id: 'pax-a920-duo', name: 'PAX A920 Duo', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'soon', launch: 'Available to purchase soon', demoStatus: 'none',
     pros: ['Customer-facing price screen', 'Replaces the A920'] },
+  { id: 'pax-a920-pro', name: 'PAX A920Pro', category: 'Pin pads and terminals', vendor: 'PAX', cost: 332, demoStatus: 'none' },
   { id: 'pax-a360', name: 'PAX A360 Pin Pad', category: 'Pin pads and terminals', vendor: 'PAX',
     availability: 'unknown', launch: 'Details and launch date not yet known', demoStatus: 'none' },
   { id: 'pax-a380', name: 'PAX A380 Pin Pad', category: 'Pin pads and terminals', vendor: 'PAX',
@@ -199,6 +200,11 @@ export const UPDATES = [
     // the floor kiosk being tested is the 27-inch K300-270, not the K300-215
     const p = board.products['matsuda-floor'];
     if (p && /K300-215/.test(p.name)) p.name = p.name.replace('K300-215', 'K300-270 27"');
+  } },
+  { id: '2026-11-24-a920-pro', apply(board) {
+    if (board.products['pax-a920-pro']) return;
+    const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'pax-a920-pro');
+    board.products[id] = { ...structuredClone(doc), createdAt: Date.now(), createdBy: 'Added by update' };
   } },
 ];
 
