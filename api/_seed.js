@@ -206,6 +206,12 @@ export const UPDATES = [
     const { id, ...doc } = SEED_PRODUCTS.find(p => p.id === 'pax-a920-pro');
     board.products[id] = { ...structuredClone(doc), createdAt: Date.now(), createdBy: 'Added by update' };
   } },
+  { id: '2026-11-24-a920-pro-spec', apply(board) {
+    const p = board.products['pax-a920-pro']; if (!p) return;
+    const url = 'https://cdn.shopify.com/s/files/1/0398/6571/2793/files/A920Pro_PCI_5_Data_Sheet.pdf?v=1760022001';
+    p.specs = p.specs || [];
+    if (!p.specs.some(s => s.url === url)) p.specs.push({ name: 'A920Pro data sheet', url });
+  } },
 ];
 
 export function startingBoard() {
