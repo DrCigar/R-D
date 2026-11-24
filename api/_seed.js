@@ -183,6 +183,18 @@ export const UPDATES = [
       p.signoffs = { ...(p.signoffs || {}), exec: { by: 'Approved before sign-offs', date: p.decisionDate || '' } };
     }
   } },
+  { id: '2026-11-24-kiosk-spec-sheets', apply(board) {
+    // official vendor spec sheets, committed under specs/
+    const add = (id, name, url) => {
+      const p = board.products[id]; if (!p) return;
+      p.specs = p.specs || [];
+      if (!p.specs.some(s => s.url === url)) p.specs.push({ name, url });
+    };
+    add('matsuda-floor', 'K300-270 spec sheet', 'specs/matsuda-k300-270-spec.pdf');
+    add('matsuda-counter', 'ST-9100F spec sheet', 'specs/matsuda-st9100f-spec.pdf');
+    add('hanasis-floor', 'AMAZE OMNIA spec sheet', 'specs/hanasis-amaze-omnia-spec.pdf');
+    add('hanasis-counter', 'AMAZE OMNIA spec sheet', 'specs/hanasis-amaze-omnia-spec.pdf');
+  } },
 ];
 
 export function startingBoard() {

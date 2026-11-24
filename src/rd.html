@@ -238,6 +238,10 @@ img{max-width:100%}
 .nstep{font-size:12.5px;line-height:1.35;color:var(--ink);background:#F6F6F4;border-radius:8px;padding:6px 9px}
 .nstep::before{content:"→ ";color:var(--verm);font-weight:800}
 .signs{display:flex;flex-wrap:wrap;gap:6px}
+.specrow{display:flex;flex-wrap:wrap;gap:4px 12px}
+.speclink{font-size:12.5px;font-weight:700;color:var(--verm);text-decoration:none}
+.speclink:hover{text-decoration:underline}
+.speclinks{display:flex;flex-wrap:wrap;gap:8px}.speclinks a{text-decoration:none}
 .lnote{border-left:3px solid var(--verm);padding:1px 0 1px 9px;font-size:12.5px;line-height:1.35}
 .lnote .lh{color:var(--muted);font-size:11.5px}.lnote .lh b{color:var(--ink)}
 .lnote p{margin:2px 0 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -388,6 +392,8 @@ function noteAgo(t) {
   const d = Math.round(h / 24); if (d < 7) return d + (d === 1 ? ' day ago' : ' days ago');
   return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
+const specLinks = (p, cls) => (p.specs || []).map(s => '<a class="' + cls + '" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.name || 'Spec sheet') + ' ↗</a>').join('');
+const specRow = p => (p.specs || []).length ? '<div class="specrow">' + specLinks(p, 'speclink') + '</div>' : '';
 const latestNote = id => S.notes.filter(n => n.product === id).sort((a, b) => b.at - a.at)[0];
 function ago(s) {
   if (!s) return ''; const days = Math.round((Date.now() - new Date(s + 'T12:00:00')) / 864e5);
@@ -620,7 +626,7 @@ function card(p) {
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(st, true)) + '">' + icon(p.category) + pill(st, true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + (p.vendor ? esc(p.vendor) : 'Vendor not set') + '</div></div>' +
     '<div class="facts">' + fact(quotesOf(p).length > 1 ? 'Best' : 'Cost', money(bestCost(p)) + (bestCost(p) != null && p.costNote ? '*' : '')) + fact('Lead time', p.leadTime) + fact('MOQ', p.moq) + '</div>' +
-    quoteList(p) +
+    quoteList(p) + specRow(p) +
     '<div class="demo ' + demoCls + '"><i></i>' + demoTxt + '</div>' +
     (st === 'approved' ? '<div class="pl2">Approved' + (p.decisionDate ? ' ' + ago(p.decisionDate) + ' · ' + fmtDate(p.decisionDate) : '') + '</div>'
       : '<div class="nstep">' + esc(nextStep(p)) + '</div>' + (LAB.includes(st) ? signBtns(p) : '')) +
@@ -641,7 +647,7 @@ function overview(list) {
   const labCard = p => '<div class="card lab-card" role="button" tabindex="0" data-open="' + esc(p.id) + '">' +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(statusOf(p), true)) + '">' + icon(p.category) + pill(statusOf(p), true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + esc([p.category, p.vendor].filter(Boolean).join(' · ')) + '</div></div>' +
-    (bestCost(p) != null ? price(p) : '') + demoBox(p) + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + lastNote(p) + signBtns(p) + '</div></div>';
+    (bestCost(p) != null ? price(p) : '') + demoBox(p) + '<div class="nstep">' + esc(nextStep(p)) + '</div>' + specRow(p) + lastNote(p) + signBtns(p) + '</div></div>';
   const lastNote = p => { const n = latestNote(p.id); return n ? '<div class="lnote"><div class="lh"><b>' + esc(n.by) + '</b> · ' + noteAgo(n.at) + '</div><p>' + esc(n.text) + '</p></div>' : ''; };
   // newest notes across every product: product name, who posted, when
   const feed = S.notes.filter(n => list.some(p => p.id === n.product)).sort((a, b) => b.at - a.at);
@@ -693,6 +699,7 @@ function renderDrawer() {
       '<div class="photo-act"><label class="btn ghost sm">Upload photo<input type="file" accept="image/*" id="photoFile" hidden></label>' +
       'or drop an image on the box, or paste an image link:<input id="f-photoUrl" data-k="photoUrl" placeholder="https://…" value="' + esc(p.photoUrl) + '" style="border:1px solid var(--line);border-radius:8px;padding:6px 9px;width:100%">' +
       ((p.photo || p.photoUrl) ? '<button class="btn danger sm" id="photoDel">Remove photo</button>' : '') + '</div></div></div>' +
+    ((p.specs || []).length ? '<div class="sec"><h4>Spec sheet</h4><div class="speclinks">' + specLinks(p, 'btn ghost sm') + '</div></div>' : '') +
     '<div class="sec dsign"><h4>Sign-offs</h4><div class="decision">' + signBtns(p) +
       '<div class="who-signed">' + Object.entries(TEAMS).map(([t, l]) => { const s = (p.signoffs || {})[t]; return l + ': ' + (s ? esc(s.by) + (s.date ? ' · ' + fmtDate(s.date) : '') : 'not yet'); }).join('<br>') + '</div>' +
       '<div style="font-size:12.5px;color:var(--muted)">' + (st === 'approved' ? 'Approved' + (p.decisionDate ? ' ' + fmtDate(p.decisionDate) : '') + '.' : 'Approves automatically once SC Ops, Systems and C-Suite all sign off.') + '</div>' +
@@ -905,6 +912,7 @@ function toggleDemo(id) {
   const p = S.products.find(x => x.id === id); if (!p) return;
   patch(p, p.demoStatus === 'inhouse' ? { demoStatus: 'none', demoDate: '' } : { demoStatus: 'inhouse', demoDate: p.demoDate || today() }, !!openId);
 }
+document.addEventListener('click', e => { if (e.target.closest('.speclink')) e.stopPropagation(); }, true);
 document.addEventListener('click', e => { const d = e.target.closest('[data-demo]'); if (!d) return; e.stopPropagation(); toggleDemo(d.dataset.demo); }, true);
 document.addEventListener('toggle', e => { if (e.target.matches?.('details.hist')) S.histOpen = e.target.open; }, true);
 $('#view').onclick = e => {

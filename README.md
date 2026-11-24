@@ -22,6 +22,8 @@ The Overview (default view) has three parts:
 - `api/_seed.js` – starter products, loaded once into an empty database
 - `img/` – product photos for the starter products (`<id>.png`)
 
+Official spec sheets live in `specs/` and show as a **Spec sheet** link on the card and in the product panel (added with an UPDATE in `api/_seed.js`).
+
 Attached files (vendor proposals, spec sheets; up to 3 MB, one per product) are uploaded inside the app and kept in that storage, never in this repo.
 - `api/data.js`, `api/_db.js` – the API. Storage is picked automatically: **Neon** when `DATABASE_URL` is set (one table, `rd_store`), otherwise a private **Vercel Blob** store. Either way the board is one JSON document, and a save only lands if nobody else saved in between (otherwise it re-reads and retries), so two people editing at once don't overwrite each other.
 - `build.mjs` – run `node build.mjs` to make `index.html` (the page Vercel serves). Commit `index.html`.
