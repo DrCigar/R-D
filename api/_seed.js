@@ -195,6 +195,11 @@ export const UPDATES = [
     add('hanasis-floor', 'AMAZE OMNIA spec sheet', 'specs/hanasis-amaze-omnia-spec.pdf');
     add('hanasis-counter', 'AMAZE OMNIA spec sheet', 'specs/hanasis-amaze-omnia-spec.pdf');
   } },
+  { id: '2026-11-24-k300-270-name', apply(board) {
+    // the floor kiosk being tested is the 27-inch K300-270, not the K300-215
+    const p = board.products['matsuda-floor'];
+    if (p && /K300-215/.test(p.name)) p.name = p.name.replace('K300-215', 'K300-270 27"');
+  } },
 ];
 
 export function startingBoard() {
