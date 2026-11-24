@@ -64,16 +64,21 @@ img{max-width:100%}
 .card{position:relative;cursor:pointer;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-align:left;padding:0;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s}
 .card:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .card.def{border:2px solid var(--s-approved);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-approved) 18%,transparent)}
-.defbox{position:absolute;top:8px;right:8px;z-index:2;display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:background .15s}
+.defgrp{position:absolute;top:8px;right:8px;z-index:2;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.dh .defgrp{position:static;flex:none;flex-direction:row;align-items:center}
+.defbox{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:999px;padding:4px 11px 4px 5px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:background .15s}
 .defbox:hover{border-color:var(--ink);color:var(--ink)}
 .defbox .ck{width:20px;height:20px;border:2px solid #b8b8b4;border-radius:6px;display:grid;place-items:center;background:#fff;color:transparent}
 .defbox .ck svg{width:14px;height:14px}
 .card.def .defbox{background:var(--s-approved);border-color:var(--s-approved);color:#fff;font-size:13px;padding:5px 14px 5px 5px}
 .card.def .defbox .ck{width:34px;height:34px;border:0;border-radius:50%;color:var(--s-approved)}
 .card.def .defbox .ck svg{width:24px;height:24px}
-.dh .defbox{position:static;flex:none}
 .dh .defbox.on{background:var(--s-approved);border-color:var(--s-approved);color:#fff}
 .dh .defbox.on .ck{border:0;border-radius:50%;color:var(--s-approved)}
+.card.bak{border:2px solid var(--s-prelaunch);box-shadow:0 0 0 3px color-mix(in srgb,var(--s-prelaunch) 16%,transparent)}
+.defbox.bk.on{background:var(--s-prelaunch);border-color:var(--s-prelaunch);color:#fff}
+.defbox.bk.on .ck{border:0;border-radius:50%;color:var(--s-prelaunch)}
+.card.bak .defbox.bk{font-size:13px;padding:5px 14px 5px 5px}.card.bak .defbox.bk .ck{width:34px;height:34px}.card.bak .defbox.bk .ck svg{width:24px;height:24px}
 .mc .dchk{margin-left:auto;flex:none;width:24px;height:24px;border-radius:50%;background:var(--s-approved);color:#fff;display:grid;place-items:center}
 .mc .dchk svg{width:15px;height:15px}
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
@@ -622,7 +627,7 @@ function card(p) {
   const fact = (k, v) => '<div><div class="k">' + k + '</div><div class="v' + (v ? '' : ' na') + '" title="' + esc(v) + '">' + (v ? esc(v) : '—') + '</div></div>';
   const demoCls = p.demoStatus === 'inhouse' ? 'in' : p.demoStatus === 'requested' ? 'req' : '';
   const demoTxt = DEMO[p.demoStatus || ''] + (p.demoDate ? ' · received ' + fmtDate(p.demoDate) : '') + (p.demoQty ? ' · qty ' + esc(p.demoQty) : '');
-  return '<div class="card' + (p.isDefault ? ' def' : '') + '" role="button" tabindex="0" data-open="' + esc(p.id) + '">' + defBox(p) +
+  return '<div class="card' + (p.isDefault ? ' def' : p.isBackup ? ' bak' : '') + '" role="button" tabindex="0" data-open="' + esc(p.id) + '">' + defBox(p) +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill(st, true)) + '">' + icon(p.category) + pill(st, true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + (p.vendor ? esc(p.vendor) : 'Vendor not set') + '</div></div>' +
     '<div class="facts">' + fact(quotesOf(p).length > 1 ? 'Best' : 'Cost', money(bestCost(p)) + (bestCost(p) != null && p.costNote ? '*' : '')) + fact('Lead time', p.leadTime) + fact('MOQ', p.moq) + '</div>' +
@@ -640,7 +645,7 @@ function overview(list) {
   const closed = list.filter(p => ['rejected', 'hold'].includes(statusOf(p))).sort(byDate);
   const hist = list.filter(p => statusOf(p) === 'approved' && !isRecent(p)).sort(byDate);
   const price = p => bestCost(p) != null ? '<span class="price">' + money(bestCost(p)) + '</span>' : '<span></span>';
-  const shelfCard = p => '<div class="card shelf-card' + (p.isDefault ? ' def' : '') + '" role="button" tabindex="0" data-open="' + esc(p.id) + '">' + defBox(p) +
+  const shelfCard = p => '<div class="card shelf-card' + (p.isDefault ? ' def' : p.isBackup ? ' bak' : '') + '" role="button" tabindex="0" data-open="' + esc(p.id) + '">' + defBox(p) +
     '<div class="ph" data-photo="' + esc(p.id) + '" data-keep="' + esc(pill('approved', true)) + '">' + icon(p.category) + pill('approved', true) + '</div>' +
     '<div class="cb"><div><div class="nm">' + esc(p.name) + '</div><div class="vd">' + esc(p.category || '') + '</div></div>' +
     '<div class="srow">' + price(p) + '<span class="when">' + (p.decisionDate ? 'Approved ' + fmtDate(p.decisionDate) : 'Approved') + '</span></div></div></div>';
@@ -669,7 +674,9 @@ function overview(list) {
     (hist.length ? '<details class="hist"' + (S.histOpen ? ' open' : '') + '><summary>Older approvals <span>' + hist.length + ' approved more than ' + RECENT_DAYS + ' days ago</span></summary>' + hist.map(row).join('') + '</details>' : '');
 }
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-const defBox = p => '<button class="defbox' + (p.isDefault ? ' on' : '') + '" data-def="' + esc(p.id) + '" role="checkbox" aria-checked="' + !!p.isDefault + '" title="' + (p.isDefault ? 'This is the current default. Click to unmark.' : 'Mark as the current default') + '"><span class="ck">' + CHECK + '</span>' + (p.isDefault ? 'Current default' : 'Default') + '</button>';
+const defBox = p => '<div class="defgrp">' + (p.isBackup ? '' : defBtn(p)) + (p.isDefault ? '' : bakBtn(p)) + '</div>';
+const bakBtn = p => '<button class="defbox bk' + (p.isBackup ? ' on' : '') + '" data-bak="' + esc(p.id) + '" role="checkbox" aria-checked="' + !!p.isBackup + '" title="' + (p.isBackup ? 'This is the backup option. Click to unmark.' : 'Mark as a backup option') + '"><span class="ck">' + CHECK + '</span>' + (p.isBackup ? 'Backup option' : 'Backup') + '</button>';
+const defBtn = p => '<button class="defbox' + (p.isDefault ? ' on' : '') + '" data-def="' + esc(p.id) + '" role="checkbox" aria-checked="' + !!p.isDefault + '" title="' + (p.isDefault ? 'This is the current default. Click to unmark.' : 'Mark as the current default') + '"><span class="ck">' + CHECK + '</span>' + (p.isDefault ? 'Current default' : 'Default') + '</button>';
 // Vendor price list on the card: only when there's more than one quote to compare
 function quoteList(p) {
   const qs = quotesOf(p);
@@ -883,7 +890,11 @@ $('#viewSeg').onclick = e => { const b = e.target.closest('button'); if (!b) ret
 $('#q').oninput = render;
 function toggleDefault(id) {
   const p = S.products.find(x => x.id === id); if (!p) return;
-  patch(p, { isDefault: !p.isDefault }, !!openId);
+  patch(p, { isDefault: !p.isDefault, isBackup: false }, !!openId);
+}
+function toggleBackup(id) {
+  const p = S.products.find(x => x.id === id); if (!p) return;
+  patch(p, { isBackup: !p.isBackup, isDefault: false }, !!openId);
 }
 // Sign-offs: SC Ops, Systems and C-Suite; the last one approves the product (with a stamp) and moves it to "Just approved".
 async function signOff(id, team) {
@@ -917,10 +928,11 @@ document.addEventListener('click', e => { const d = e.target.closest('[data-demo
 document.addEventListener('toggle', e => { if (e.target.matches?.('details.hist')) S.histOpen = e.target.open; }, true);
 $('#view').onclick = e => {
   const d = e.target.closest('[data-def]'); if (d) { e.stopPropagation(); return toggleDefault(d.dataset.def); }
+  const k = e.target.closest('[data-bak]'); if (k) { e.stopPropagation(); return toggleBackup(k.dataset.bak); }
   const c = e.target.closest('[data-open]'); if (c) openDrawer(c.dataset.open);
 };
 $('#view').onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.card, .hrow')) { e.preventDefault(); openDrawer(e.target.dataset.open); } };
-$('#drawerHost').addEventListener('click', e => { const d = e.target.closest('[data-def]'); if (d) toggleDefault(d.dataset.def); });
+$('#drawerHost').addEventListener('click', e => { const d = e.target.closest('[data-def]'); if (d) toggleDefault(d.dataset.def); const k = e.target.closest('[data-bak]'); if (k) toggleBackup(k.dataset.bak); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && openId) closeDrawer(); });
 
 boot();

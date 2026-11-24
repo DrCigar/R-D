@@ -10,7 +10,7 @@ const base = {
   category: '', vendor: '', cost: null, costNote: '', leadTime: '', moq: '',
   availability: 'now', launch: '', pros: [], cons: [],
   demoStatus: '', demoDate: '', demoQty: '',
-  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false, gallery: [], signoffs: {},
+  decision: 'pending', decisionDate: '', decisionBy: '', phases: {}, photo: null, photoUrl: '', docUrl: '', doc: null, quotes: [], isDefault: false, isBackup: false, gallery: [], signoffs: {},
 };
 
 export const SEED_PRODUCTS = [
